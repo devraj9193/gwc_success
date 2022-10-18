@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
-import 'package:intl/intl.dart';
+import 'package:gwc_success_team/widgets/unfocus_widget.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 import 'package:sizer/sizer.dart';
 import '../../utils/constants.dart';
 
@@ -10,6 +12,7 @@ class MessageScreen extends StatefulWidget {
   @override
   State<MessageScreen> createState() => _MessageScreenState();
 }
+
 
 class _MessageScreenState extends State<MessageScreen> {
   final formKey = GlobalKey<FormState>();
@@ -102,171 +105,214 @@ class _MessageScreenState extends State<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: gSecondaryColor,
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 8.h, left: 4.w, right: 4.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Image(
-                      height: 3.h,
-                      image: const AssetImage("assets/images/Group 2861.png"),
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Ms. Lorem Ipsum Daries",
-                        style: TextStyle(
-                            fontFamily: "PoppinsRegular",
-                            color: gWhiteColor,
-                            fontSize: 10.sp),
-                      ),
-                      SizedBox(height: 0.5.h),
-                      Text(
-                        "Age : 26 Female",
-                        style: TextStyle(
-                            fontFamily: "PoppinsLight",
-                            color: gWhiteColor,
-                            fontSize: 9.sp),
-                      ),
-                      SizedBox(height: 2.h),
-                    ],
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color: gWhiteColor.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Icon(
-                        Icons.local_phone,
-                        color: gPrimaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 3.h),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        blurRadius: 2, color: Colors.grey.withOpacity(0.5))
-                  ],
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return UnfocusWidget(
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 2.h, left: 4.w, right: 4.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: buildMessageList(),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 5),
+                        child: Icon(Icons.arrow_back,
+                          color: gMainColor,
+                        ),
+                      )
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 5.h,
-                            margin: EdgeInsets.symmetric(vertical: 1.h),
-                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xffF8F4F4),
-                              borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                image: AssetImage("assets/images/cheerful.png")
+                              ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: gGreyColor,
+                                  offset: Offset(0, 1),
+                                  blurRadius: 5,
+                                  spreadRadius: 0.1,
+                                ),
+                              ]
                             ),
-                            child: Form(
-                              key: formKey,
-                              child: Center(
-                                child: TextFormField(
-                                  cursorColor: kPrimaryColor,
-                                  controller: commentController,
-                                  decoration: InputDecoration(
-                                    hintText: "Say Something ...",
-                                    hintStyle: TextStyle(
-                                      color: gMainColor,
-                                      fontSize: 9.sp,
-                                      fontFamily: "GothamBook",
-                                    ),
-                                    border: InputBorder.none,
-                                    suffixIcon: commentController.text
-                                            .toString()
-                                            .isEmpty
-                                        ? InkWell(
+                            width: 9.w,
+                            height: 9.w,
+                            // backgroundImage: AssetImage("assets/images/cheerful.png"),
+                          ),
+                          SizedBox(width: 2.w),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Loreum Ipsum dadids',
+                                style: TextStyle(
+                                  color: kTextColor,
+                                  fontFamily: 'GothamMedium',
+                                  fontSize: 10.sp,
+                                ),
+                              ),
+                              SizedBox(height: 0.6.h),
+                              Text(
+                                'Bangalore, India',
+                                style: TextStyle(
+                                  color: kTextColor,
+                                  fontFamily: 'GothamBook',
+                                  fontSize: 9.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: gWhiteColor.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Icon(
+                          Icons.local_phone,
+                          color: gPrimaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 3.h),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 2, color: Colors.grey.withOpacity(0.5))
+                    ],
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: buildMessageList(),
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.symmetric(vertical: 1.h),
+                              padding: EdgeInsets.symmetric(horizontal: 2.w),
+                              decoration: BoxDecoration(
+                                color: const Color(0xffF8F4F4),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Form(
+                                key: formKey,
+                                child: Center(
+                                  child: TextFormField(
+                                    cursorColor: kPrimaryColor,
+                                    textAlignVertical: TextAlignVertical.center,
+                                    controller: commentController,
+                                    decoration: InputDecoration(
+                                      hintText: "Say Something ...",
+                                      hintStyle: TextStyle(
+                                        color: gMainColor,
+                                        fontSize: 9.sp,
+                                        fontFamily: "GothamBook",
+                                      ),
+                                      border: InputBorder.none,
+                                      prefixIcon: Icon(Icons.mood),
+                                      suffixIcon: commentController.text
+                                              .toString()
+                                              .isEmpty
+                                          ? Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          InkWell(
                                             onTap: () {},
                                             child: const Icon(
-                                              Icons.add,
+                                              Icons.attach_file,
+                                              color: gPrimaryColor,
+                                            ),
+                                          ),
+                                          InkWell(
+                                            onTap: () {},
+                                            child: const Icon(
+                                              CupertinoIcons.camera_fill,
                                               color: gPrimaryColor,
                                             ),
                                           )
-                                        : Container(
-                                            width: 0,
-                                          ),
+                                        ],
+                                      )
+                                          : Container(
+                                              width: 0,
+                                            ),
+                                    ),
+                                    style: TextStyle(
+                                        fontFamily: "GothamMedium",
+                                        color: gTextColor,
+                                        fontSize: 9.sp),
+                                    textInputAction: TextInputAction.next,
+                                    textAlign: TextAlign.start,
+                                    keyboardType: TextInputType.emailAddress,
                                   ),
-                                  style: TextStyle(
-                                      fontFamily: "GothamMedium",
-                                      color: gTextColor,
-                                      fontSize: 9.sp),
-                                  textInputAction: TextInputAction.next,
-                                  textAlign: TextAlign.start,
-                                  keyboardType: TextInputType.emailAddress,
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        commentController.text.toString().isNotEmpty
-                            ? SizedBox(
-                                width: 2.w,
-                              )
-                            : Container(width: 0),
-                        commentController.text.toString().isEmpty
-                            ? Container(
-                                width: 0,
-                              )
-                            : InkWell(
-                                onTap: () {
-                                  final message = Message(
-                                      text: commentController.text.toString(),
-                                      date: DateTime.now(),
-                                      sendMe: true,
-                                      image:
-                                          "assets/images/closeup-content-attractive-indian-business-lady.png");
-                                  setState(() {
-                                    messages.add(message);
-                                  });
-                                  commentController.clear();
-                                },
-                                child: const Icon(
-                                  Icons.send,
-                                  color: kPrimaryColor,
+                          commentController.text.toString().isNotEmpty
+                              ? SizedBox(
+                                  width: 2.w,
+                                )
+                              : Container(width: 0),
+                          commentController.text.toString().isEmpty
+                              ? Container(
+                                  width: 0,
+                                )
+                              : InkWell(
+                                  onTap: () {
+                                    final message = Message(
+                                        text: commentController.text.toString(),
+                                        date: DateTime.now(),
+                                        sendMe: true,
+                                        image:
+                                            "assets/images/closeup-content-attractive-indian-business-lady.png");
+                                    setState(() {
+                                      messages.add(message);
+                                    });
+                                    commentController.clear();
+                                  },
+                                  child: const Icon(
+                                    Icons.send,
+                                    color: kPrimaryColor,
+                                  ),
                                 ),
-                              ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -295,7 +341,7 @@ class _MessageScreenState extends State<MessageScreen> {
       itemBuilder: (context, Message message) => Align(
         alignment:
             message.sendMe ? Alignment.centerRight : Alignment.centerLeft,
-        child: Stack(
+        child: Column(
           children: [
             Container(
               margin: message.sendMe
@@ -304,55 +350,42 @@ class _MessageScreenState extends State<MessageScreen> {
               padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.5.h),
               decoration: BoxDecoration(
                   color: message.sendMe
-                      ? gGreyColor.withOpacity(0.2)
+                      ? gChatMeColor
                       : gSecondaryColor,
                   borderRadius: BorderRadius.circular(10)),
-              child: Text(
-                message.text.toString(),
-                style: TextStyle(
-                    fontFamily: "GothamBook",
-                    height: 1.5,
-                    color: message.sendMe ? gTextColor : gWhiteColor,
-                    fontSize: 10.sp),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message.text.toString(),
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        fontFamily: "GothamBook",
+                        height: 1.5,
+                        color: message.sendMe ? gTextColor : gWhiteColor,
+                        fontSize: 10.sp),
+                  ),
+                  Positioned(
+                    child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('10:49 AM',
+                            style: TextStyle(
+                                fontSize: 8.sp
+                            ),
+                          ),
+                          Visibility(
+                              visible: message.sendMe,
+                              child: Icon(Icons.done_all,
+                                size: 10.sp,
+                              )
+                          )
+                        ],
+                      ),
+                  )
+                ],
               ),
             ),
-            message.sendMe
-                ? Positioned(
-                    top: -8,
-                    right: -10,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: gSecondaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image(
-                          image: AssetImage(message.image),
-                          height: 3.h,
-                        ),
-                      ),
-                    ),
-                  )
-                : Positioned(
-                    top: -8,
-                    left: -14,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: gWhiteColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image(
-                          image: AssetImage(message.image),
-                          height: 3.h,
-                        ),
-                      ),
-                    ),
-                  ),
           ],
         ),
       ),

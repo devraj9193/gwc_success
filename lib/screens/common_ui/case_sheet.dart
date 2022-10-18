@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-
 import '../../utils/constants.dart';
-import '../../utils/widgets.dart';
+import '../../widgets/widgets.dart';
 
 
 class CaseSheet extends StatefulWidget {

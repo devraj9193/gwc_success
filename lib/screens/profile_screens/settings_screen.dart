@@ -40,7 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(
                       fontFamily: 'GothamBold',
                       color: gPrimaryColor,
-                      fontSize: 11.sp),
+                      fontSize: 12.sp),
                 ),
                 SizedBox(height: 2.h),
                 Row(
@@ -124,40 +124,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   profileTile(String image, String title, func) {
-    return Row(
-      children: [
-        Container(
-          margin: EdgeInsets.symmetric(vertical: 2.h),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: gBlackColor.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Image(
-            image: AssetImage(image),
-            height: 3.h,
-          ),
-        ),
-        SizedBox(width: 3.w),
-        Expanded(
-          child: Text(
-            title,
-            style: TextStyle(
-              color: kTextColor,
-              fontFamily: 'GothamMedium',
-              fontSize: 9.sp,
+    return GestureDetector(
+      onTap: func,
+      child: Row(
+        children: [
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 2.h),
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: gBlackColor.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Image(
+              image: AssetImage(image),
+              height: 3.h,
             ),
           ),
-        ),
-        GestureDetector(
-          onTap: func,
-          child: Icon(
-            Icons.arrow_forward_ios,
-            color: gBlackColor,
-            size: 2.h,
+          SizedBox(width: 3.w),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: kTextColor,
+                fontFamily: 'GothamMedium',
+                fontSize: 10.sp,
+              ),
+            ),
           ),
-        ),
-      ],
+          GestureDetector(
+            onTap: func,
+            child: Icon(
+              Icons.arrow_forward_ios,
+              color: gBlackColor,
+              size: 2.h,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

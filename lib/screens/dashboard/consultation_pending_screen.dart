@@ -266,16 +266,18 @@ class _ConsultationPendingScreenState extends State<ConsultationPendingScreen> {
           onTap: callOnTap,
           child: Image.asset(
             'assets/images/Group 4890.png',
-            height: 2.h,
+            height: 3.h,
+            width: 3.h,
             color: gBlackColor,
           ),
         ),
-        SizedBox(width: 2.w),
+        SizedBox(width: 4.w),
         GestureDetector(
           onTap: chatOnTap,
           child: Image.asset(
             'assets/images/Group 4891.png',
-            height: 2.h,
+            height: 3.h,
+            width: 3.h,
             color: gBlackColor,
           ),
         ),

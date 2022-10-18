@@ -13,6 +13,8 @@ const gTapColor = Color(0xffF8FAFF);
 const gBackgroundColor = Color(0xffFFE889);
 const gPdfColor = Color(0xffFCF6F0);
 
+const gChatMeColor = Color(0xFFd4ff90);
+
 const kPrimaryColor = Color(0xffBB0A36);
 const kSecondaryColor = Color(0xffFFF5F5);
 const kTextColor = Color(0xff000000);

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -62,8 +63,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        extendBody: true,
         body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -97,6 +99,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         color: Colors.white,
+        border: Border.all(color: gMainColor, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -107,9 +110,11 @@ class _CalenderScreenState extends State<CalenderScreen> {
       padding: EdgeInsets.symmetric(horizontal: 2.w),
       margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
       child: TextFormField(
+        textAlignVertical: TextAlignVertical.center,
         controller: searchController,
+        textAlign: TextAlign.left,
         decoration: InputDecoration(
-          icon: Icon(
+          prefixIcon: Icon(
             Icons.search,
             color: gMainColor,
             size: 2.5.h,
@@ -157,11 +162,11 @@ class _CalenderScreenState extends State<CalenderScreen> {
               child: SfCalendar(
                 view: CalendarView.week,
                 showDatePickerButton: true,
-                showWeekNumber: true,
+                showWeekNumber: false,
                 showNavigationArrow: true,
                 showCurrentTimeIndicator: true,
                 allowViewNavigation: true,
-                allowDragAndDrop: true,
+                allowDragAndDrop: false,
                 dataSource: MeetingDataSource(_getDataSource(data)),
                 headerStyle: CalendarHeaderStyle(
                   textAlign: TextAlign.center,

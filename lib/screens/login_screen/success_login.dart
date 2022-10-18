@@ -357,7 +357,8 @@ class _SuccessLoginState extends State<SuccessLogin> {
             });
             Get.to(() => const DashboardScreen());
             buildSnackBar("Login", "Successful");
-          } else if (responseData['status'] == 401) {
+          }
+          else if (responseData['status'] == 401) {
             setState(() {
               isLoading = false;
             });
@@ -375,7 +376,8 @@ class _SuccessLoginState extends State<SuccessLogin> {
       //   });
       //   throw Exception(e);
       // }
-    } else {
+    }
+    else {
       setState(() {
         isLoading = false;
       });

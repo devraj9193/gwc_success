@@ -19,29 +19,40 @@ class BottomBar extends StatefulWidget {
 class _BottomBarState extends State<BottomBar> {
   @override
   Widget build(BuildContext context) {
-    return BottomAppBar(
-      color: Colors.white,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          buildTabView1(
-            index: 0,
-            image: 'assets/images/dashboard.png',
-          ),
-          buildTabView(
-            index: 1,
-            image: 'assets/images/teams_bottom.png',
-          ),
-          buildTabView(
-            index: 2,
-            image: 'assets/images/chat_bottom.png',
-          ),
-          buildTabView1(
-            index: 3,
-            image: 'assets/images/profile_bottom.png',
-          ),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(8),
+          topLeft: Radius.circular(8)
+        ),
+        color: gMainColor.withOpacity(0.4)
+      ),
+      height: 7.5.h,
+      child: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        // color: Colors.white,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            buildTabView(
+              index: 0,
+              image: 'assets/images/dashboard.png',
+            ),
+            buildTabView(
+              index: 1,
+              image: 'assets/images/teams_bottom.png',
+            ),
+            buildTabView(
+              index: 2,
+              image: 'assets/images/chat_bottom.png',
+            ),
+            buildTabView(
+              index: 3,
+              image: 'assets/images/profile_bottom.png',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -56,7 +67,7 @@ class _BottomBarState extends State<BottomBar> {
       padding: EdgeInsets.all(1.h),
       child: InkWell(
         child: Image(
-            height: 3.h,
+            height: isSelected ? 3.h : 2.5.h,
             image: AssetImage(image),
             color: isSelected ? gPrimaryColor : gBlackColor,
             fit: BoxFit.contain),

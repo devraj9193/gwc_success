@@ -86,12 +86,12 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
                   BoxShadow(blurRadius: 2, color: Colors.grey.withOpacity(0.5))
                 ],
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
                 ),
                 image: const DecorationImage(
                     image: AssetImage("assets/images/cheerful_profile.png"),
-                    fit: BoxFit.fill),
+                    fit: BoxFit.fitWidth),
               ),
             ),
           ),
@@ -105,8 +105,8 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
               decoration: BoxDecoration(
                   color: gWhiteColor,
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12)),
                   border: Border.all(width: 1, color: gMainColor)),
               child: Column(
                 children: [
