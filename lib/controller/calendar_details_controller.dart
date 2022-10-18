@@ -17,7 +17,6 @@ class CalendarDetailsController extends GetxController {
   Future<List<Meeting>?> fetchCalendarList() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var token = preferences.getString("token");
-    print(token);
 
     final response = await http.get(
         Uri.parse("${GwcApi.calendarUrl}?start=2022-10-13&end=2022-10-31"),
@@ -27,7 +26,7 @@ class CalendarDetailsController extends GetxController {
     if (response.statusCode == 200) {
       CalendarModel jsonData = calendarModelFromJson(response.body);
       List<Meeting>? arrData = jsonData.data;
-      print("status: ${response.body}");
+      //print("status: ${response.body}");
       return arrData;
     } else {
       throw Exception();

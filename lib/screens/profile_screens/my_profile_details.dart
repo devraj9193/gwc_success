@@ -136,7 +136,7 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
             Text(
               heading,
               style: TextStyle(
-                color: gPrimaryColor,
+                color: gBlackColor,
                 fontFamily: 'GothamMedium',
                 fontSize: 10.sp,
               ),
@@ -145,7 +145,7 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: gMainColor,
+                  color: gBlackColor,
                   fontFamily: 'GothamBook',
                   fontSize: 9.sp,
                 ),
