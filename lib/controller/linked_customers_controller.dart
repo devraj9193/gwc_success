@@ -43,7 +43,7 @@ class LinkedCustomersController extends GetxController {
       'Authorization': 'Bearer $token',
     });
     if (response.statusCode == 200) {
-      // print("status: ${response.body}");
+       print("status: ${response.body}");
       CustomersList jsonData = customersListFromJson(response.body);
       List<Datum>? arrData = jsonData.data;
       return arrData;

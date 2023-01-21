@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 const gPrimaryColor = Color(0xff4E7215);
 const gSecondaryColor = Color(0xffC10B02);
@@ -29,3 +28,12 @@ const kDetailsColor = Color(0xffFF5A7F);
 const kHealthColor = Color(0xffD10034);
 
 const baseUrl = "https://gwc.disol.in";
+
+const String appId = "99437";
+const String authKey = "zhVfP2jWfvrhe2r";
+const String authSecret = "WhzcEcT3tau5Mfj";
+const String accountKey = "dj8Pc_dxe2u4K8x9CzRj";
+const String defaultPassword = "GWC@2022";
+
+const String notificationChannelId = 'high_importance_channel';
+const String notificationChannelName = 'pushnotificationappchannel';

@@ -5,9 +5,9 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../../utils/constants.dart';
 import '../../widgets/widgets.dart';
 
-
 class MRScreen extends StatefulWidget {
-  const MRScreen({Key? key}) : super(key: key);
+  final String report;
+  const MRScreen({Key? key, required this.report}) : super(key: key);
 
   @override
   State<MRScreen> createState() => _MRScreenState();
@@ -18,35 +18,32 @@ class _MRScreenState extends State<MRScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                buildAppBar(() {
-                  Navigator.pop(context);
-                }),
-                SizedBox(
-                  height: 3.h,
-                ),
-                Text(
-                  "MR Report",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontFamily: 'GothamRoundedBold_21016',
-                      color: gPrimaryColor,
-                      fontSize: 12.sp),
-                ),
-                SfPdfViewer.network("src")
-              ],
-            ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildAppBar(() {
+                Navigator.pop(context);
+              }),
+              // SizedBox(height: 1.h),
+              Text(
+                "MR Report",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: 'GothamBold',
+                    color: gPrimaryColor,
+                    fontSize: 11.sp),
+              ),
+              SizedBox(height: 1.h),
+              Expanded(
+                child: SfPdfViewer.network(widget.report),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-
 }

@@ -1,4 +1,4 @@
-package com.gwc.success_team.gwc_success_team;
+package com.fembuddy.gwc_success;
 
 import io.flutter.embedding.android.FlutterActivity;
 

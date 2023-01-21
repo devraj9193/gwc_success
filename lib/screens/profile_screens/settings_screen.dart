@@ -4,6 +4,7 @@ import 'package:gwc_success_team/screens/login_screen/success_login.dart';
 import 'package:gwc_success_team/screens/profile_screens/terms_conditions_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+import '../../controller/user_profile_controller.dart';
 import '../../utils/constants.dart';
 import '../../widgets/widgets.dart';
 import 'faq_screen.dart';
@@ -17,8 +18,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // final SharedPreferences _pref = AppConfig().preferences!;
-
+  UserProfileController userProfileController =
+      Get.put(UserProfileController());
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -27,96 +28,124 @@ class _SettingsScreenState extends State<SettingsScreen> {
           physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                buildAppBar(() {
-                  Navigator.pop(context);
-                }),
-                Text(
-                  "My Profile",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontFamily: 'GothamBold',
-                      color: gPrimaryColor,
-                      fontSize: 12.sp),
-                ),
-                SizedBox(height: 2.h),
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      backgroundImage: AssetImage("assets/images/cheerful.png"),
-                    ),
-                    SizedBox(width: 2.w),
-                    Column(
+            child: FutureBuilder(
+                future: userProfileController.fetchUserProfile(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.hasError) {
+                  } else if (snapshot.hasData) {
+                    var data = snapshot.data;
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        buildAppBar(() {
+                          Navigator.pop(context);
+                        }),
                         Text(
-                          'Loreum Ipsum dadids',
+                          "My Profile",
+                          textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: kTextColor,
-                            fontFamily: 'GothamMedium',
-                            fontSize: 10.sp,
-                          ),
+                              fontFamily: 'GothamBold',
+                              color: gPrimaryColor,
+                              fontSize: 12.sp),
                         ),
-                        SizedBox(height: 0.6.h),
-                        Text(
-                          'Bangalore, India',
-                          style: TextStyle(
-                            color: kTextColor,
-                            fontFamily: 'GothamBook',
-                            fontSize: 9.sp,
-                          ),
+                        SizedBox(height: 2.h),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const MyProfileDetails(),
+                                  ),
+                                );
+                              },
+                              child: CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                  data.data.profile.toString(),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 2.w),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data.data.name ?? "",
+                                  style: TextStyle(
+                                    color: kTextColor,
+                                    fontFamily: 'GothamMedium',
+                                    fontSize: 10.sp,
+                                  ),
+                                ),
+                                SizedBox(height: 0.6.h),
+                                Text(
+                                  data.data.address ?? "Bangalore",
+                                  style: TextStyle(
+                                    color: kTextColor,
+                                    fontFamily: 'GothamBook',
+                                    fontSize: 9.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 2.h),
+                        profileTile(
+                            "assets/images/Group 2753.png", "My Profile", () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const MyProfileDetails(),
+                            ),
+                          );
+                        }),
+                        // Container(
+                        //   height: 1,
+                        //   color: Colors.grey.withOpacity(0.3),
+                        // ),
+                        // profileTile("assets/images/Group 2747.png", "FAQ", () {
+                        //   Navigator.of(context).push(
+                        //     MaterialPageRoute(
+                        //       builder: (context) => const FaqScreen(),
+                        //     ),
+                        //   );
+                        // }),
+                        // Container(
+                        //   height: 1,
+                        //   color: Colors.grey.withOpacity(0.3),
+                        // ),
+                        // profileTile("assets/images/Group 2748.png",
+                        //     "Terms & Conditions", () {
+                        //   Navigator.of(context).push(
+                        //     MaterialPageRoute(
+                        //       builder: (context) =>
+                        //           const TermsConditionsScreen(),
+                        //     ),
+                        //   );
+                        // }),
+                        Container(
+                          height: 1,
+                          color: Colors.grey.withOpacity(0.3),
+                        ),
+                        profileTile("assets/images/Group 2744.png", "Logout",
+                            () {
+                          dialog(context);
+                        }),
+                        Container(
+                          height: 1,
+                          color: Colors.grey.withOpacity(0.3),
                         ),
                       ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 2.h),
-                profileTile("assets/images/Group 2753.png", "My Profile", () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const MyProfileDetails(),
-                    ),
+                    );
+                  }
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20.h),
+                    child: buildCircularIndicator(),
                   );
                 }),
-                Container(
-                  height: 1,
-                  color: Colors.grey.withOpacity(0.3),
-                ),
-                profileTile("assets/images/Group 2747.png", "FAQ", () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const FaqScreen(),
-                    ),
-                  );
-                }),
-                Container(
-                  height: 1,
-                  color: Colors.grey.withOpacity(0.3),
-                ),
-                profileTile(
-                    "assets/images/Group 2748.png", "Terms & Conditions", () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const TermsConditionsScreen(),
-                    ),
-                  );
-                }),
-                Container(
-                  height: 1,
-                  color: Colors.grey.withOpacity(0.3),
-                ),
-                profileTile("assets/images/Group 2744.png", "Logout", () {
-                  dialog(context);
-                }),
-                Container(
-                  height: 1,
-                  color: Colors.grey.withOpacity(0.3),
-                ),
-              ],
-            ),
           ),
         ),
       ),

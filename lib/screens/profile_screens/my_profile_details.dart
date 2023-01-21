@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import '../../controller/user_profile_controller.dart';
 import '../../utils/constants.dart';
 import '../../widgets/widgets.dart';
+import 'package:get/get.dart';
 
 class MyProfileDetails extends StatefulWidget {
   const MyProfileDetails({Key? key}) : super(key: key);
@@ -11,32 +13,10 @@ class MyProfileDetails extends StatefulWidget {
 }
 
 class _MyProfileDetailsState extends State<MyProfileDetails> {
-  bool photoError = false;
-  String profile = '';
-
-  Future? getProfileDetails;
-
-  bool isEdit = false;
-
-  @override
-  void setState(VoidCallback fn) {
-    // TODO: implement setState
-    if (mounted) {
-      super.setState(fn);
-    }
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    // getProfileData();
-  }
-
+  UserProfileController userProfileController =
+      Get.put(UserProfileController());
   @override
   Widget build(BuildContext context) {
-    // double width = MediaQuery.of(context).size.width;
-    // double height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -70,61 +50,81 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
   }
 
   buildUserDetails() {
-    return LayoutBuilder(builder: (context, constraints) {
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 35.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(blurRadius: 2, color: Colors.grey.withOpacity(0.5))
-                ],
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(15),
-                  topRight: Radius.circular(15),
-                ),
-                image: const DecorationImage(
-                    image: AssetImage("assets/images/cheerful_profile.png"),
-                    fit: BoxFit.fitWidth),
+    return FutureBuilder(
+        future: userProfileController.fetchUserProfile(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasError) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 7.h),
+              child: Image(
+                image: const AssetImage("assets/images/Group 5294.png"),
+                height: 35.h,
               ),
-            ),
-          ),
-          Positioned(
-            top: 33.h,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 66.h,
-              padding: EdgeInsets.symmetric(horizontal: 5.w),
-              decoration: BoxDecoration(
-                  color: gWhiteColor,
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12)),
-                  border: Border.all(width: 1, color: gMainColor)),
-              child: Column(
+            );
+          } else if (snapshot.hasData) {
+            var data = snapshot.data;
+            return LayoutBuilder(builder: (context, constraints) {
+              return Stack(
+                fit: StackFit.expand,
                 children: [
-                  SizedBox(height: 3.h),
-                  profileTile("Name : ", "Gut-wellness Club"),
-                  profileTile("Age : ", "34"),
-                  profileTile("Gender : ", "Female"),
-                  profileTile("Email : ", "gutwellnessclub.com"),
-                  profileTile("Mobile Number : ", "1234567890"),
-                  profileTile("Email : ", "gutwellnessclub.com"),
-                  profileTile("Mobile Number : ", "1234567890"),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 35.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 2,
+                              color: Colors.grey.withOpacity(0.5))
+                        ],
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                        ),
+                        image: DecorationImage(
+                            image: NetworkImage(data.data.profile.toString()),
+                            fit: BoxFit.fill),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 33.h,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 66.h,
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      decoration: BoxDecoration(
+                          color: gWhiteColor,
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12)),
+                          border: Border.all(width: 1, color: gMainColor)),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 3.h),
+                          profileTile("Name : ", data.data.name ?? ""),
+                          profileTile("Age : ", data.data.age ?? ""),
+                          profileTile("Gender : ", data.data.gender ?? ""),
+                          profileTile("Email : ", data.data.email ?? ""),
+                          profileTile(
+                              "Mobile Number : ", data.data.phone ?? ""),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
-              ),
-            ),
-          ),
-        ],
-      );
-    });
+              );
+            });
+          }
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.h),
+            child: buildCircularIndicator(),
+          );
+        });
   }
 
   profileTile(String heading, String title) {

@@ -1,9 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:http/http.dart' as http;
+import '../../model/customer_profile_model.dart';
 import '../../utils/constants.dart';
+import '../../utils/gwc_api.dart';
 import '../../widgets/widgets.dart';
+import 'day_plan_details.dart';
 
 class ShowProfile extends StatefulWidget {
   const ShowProfile({Key? key}) : super(key: key);
@@ -13,10 +18,37 @@ class ShowProfile extends StatefulWidget {
 }
 
 class _ShowProfileState extends State<ShowProfile> {
+  bool circular = true;
+  GetCustomerModel? getCustomerModel;
+
+  @override
+  void initState() {
+    super.initState();
+    getProfileData();
+  }
+
+  void getProfileData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    var token = preferences.getString("token")!;
+    var userId = preferences.getString("user_id");
+
+    var response = await http.get(
+        Uri.parse("${GwcApi.getCustomerProfileApiUrl}/$userId"),
+        headers: {
+          'Authorization': 'Bearer $token',
+        });
+
+    var data = jsonDecode(response.body);
+
+    setState(() {
+      getCustomerModel = GetCustomerModel.fromJson(data);
+    });
+    circular = false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    // double width = MediaQuery.of(context).size.width;
-    // double height = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -39,66 +71,109 @@ class _ShowProfileState extends State<ShowProfile> {
   }
 
   buildUserDetails() {
-    return LayoutBuilder(builder: (context, constraints) {
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 35.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(blurRadius: 2, color: Colors.grey.withOpacity(0.5))
-                ],
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(15),
-                  topRight: Radius.circular(15),
-                ),
-                image: const DecorationImage(
-                    image: AssetImage("assets/images/cheerful_profile.png"),
-                    fit: BoxFit.fitWidth),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 33.h,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 66.h,
-              padding: EdgeInsets.symmetric(horizontal: 5.w),
-              decoration: BoxDecoration(
-                  color: gWhiteColor,
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12)),
-                  border: Border.all(width: 1, color: gMainColor)),
-              child: Column(
+    return   circular
+        ? buildCircularIndicator()
+        : LayoutBuilder(builder: (context, constraints) {
+              return Stack(
+                fit: StackFit.expand,
                 children: [
-                  SizedBox(height: 3.h),
-                  profileTile("Name : ", "Gut-wellness Club"),
-                  profileTile("Age : ", "34"),
-                  profileTile("Consultation & time : ", ""),
-                  profileTile("Program Name : ", "Detox Program"),
-                  profileTile("Meal & Yoga Plan : ", "Detox Meal Plan", showViewText: true, viewText: 'view'),
-                  profileTile("MR Report : ", "Uploaded", showViewText: true, viewText: 'view'),
-                  profileTile("Case Sheet : ", "Uploaded", showViewText: true,viewText: 'view'),
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 35.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 2,
+                              color: Colors.grey.withOpacity(0.5))
+                        ],
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                        ),
+                        image: DecorationImage(
+                            image: NetworkImage(getCustomerModel!.profile.toString()),
+                            fit: BoxFit.fill),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 33.h,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 66.h,
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      decoration: BoxDecoration(
+                        color: gWhiteColor,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12)),
+                        border: Border.all(width: 1, color: gMainColor),
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 2.h),
+                          profileTile("Name : ", getCustomerModel?.username ?? ""),
+                          profileTile("Age : ", getCustomerModel?.age ?? ""),
+                          profileTile(
+                              "Consultation & time : ",
+                              "${getCustomerModel?.consultationDateAndTime?.appointmentDate} / ${getCustomerModel?.consultationDateAndTime?.appointmentStartTime}" ??
+                                  ""),
+                          profileTile(
+                              "Program Name : ", getCustomerModel?.programName?.name ?? ""),
+                          profileTile("Meal & Yoga Plan : ",
+                              getCustomerModel?.mealAndYogaPlan?.name ?? "",
+                              showViewText:
+                              getCustomerModel?.mealAndYogaPlan == null ? false : true,
+                              viewText: 'view', func: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const DayPlanDetails(),
+                              ),
+                            );
+                          }),
+                          // profileTile("MR Report : ", "Uploaded",
+                          //     showViewText:
+                          //         data.mrReport == null ? false : true,
+                          //     viewText: 'view', func: () {
+                          //   Navigator.of(context).push(
+                          //     MaterialPageRoute(
+                          //       builder: (context) => MRScreen(
+                          //         report: data.mrReport.report,
+                          //       ),
+                          //     ),
+                          //   );
+                          // }),
+                          // profileTile("Case Sheet : ", "Uploaded",
+                          //     showViewText:
+                          //         data.caseSheet == null ? false : true,
+                          //     viewText: 'view', func: () {
+                          //   Navigator.of(context).push(
+                          //     MaterialPageRoute(
+                          //       builder: (context) => CaseSheetDetails(
+                          //         report: data.caseSheet.report,
+                          //       ),
+                          //     ),
+                          //   );
+                          // }),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
-              ),
-            ),
-          ),
-        ],
-      );
-    });
+              );
+            });
+
   }
 
-  profileTile(String heading, String title, {bool showViewText = false, String? viewText}) {
+  profileTile(String heading, String title,
+      {bool showViewText = false, String? viewText, func}) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 3.w),
+      padding: EdgeInsets.symmetric(vertical: 1.5.h),
       child: Row(
         // mainAxisSize: MainAxisSize.min,
         children: [
@@ -107,53 +182,46 @@ class _ShowProfileState extends State<ShowProfile> {
             style: TextStyle(
               color: gMainColor,
               fontFamily: 'GothamBold',
-              fontSize: 11.sp,
+              fontSize: 10.sp,
             ),
           ),
-          (!showViewText) ?
-          Text(
-            title,
-            style: TextStyle(
-              color: gPrimaryColor,
-              fontFamily: 'GothamMedium',
-              fontSize: 10.5.sp,
-            ),
-          ) :
-          RichText(
-            text: TextSpan(
-                text: title,
-                style: TextStyle(
-                    fontFamily: "GothamBold",
+          (!showViewText)
+              ? Text(
+                  title,
+                  style: TextStyle(
                     color: gPrimaryColor,
-                    fontSize: 10.sp
-                ),
-                children: [
-                  TextSpan(
-                    text: ' ',
-                    style: TextStyle(
-                      fontFamily: "GothamBold",
-                    ),
+                    fontFamily: 'GothamMedium',
+                    fontSize: 9.sp,
                   ),
-                  TextSpan(
-                    text: viewText,
-                    style: TextStyle(
-                      fontFamily: "GothamMedium",
-                      color: gSecondaryColor,
-                      fontSize: 10.sp,
-                      decoration: TextDecoration.underline,
-                    ),
-                    recognizer: TapGestureRecognizer()..onTap = () {
-                      print('Tap Here onTap');
-                    },
-
-                  )
-                ]
-            ),
-          ),
+                )
+              : RichText(
+                  text: TextSpan(
+                      text: title,
+                      style: TextStyle(
+                          fontFamily: "GothamMedium",
+                          color: gPrimaryColor,
+                          fontSize: 9.sp),
+                      children: [
+                        const TextSpan(
+                          text: ' ',
+                          style: TextStyle(
+                            fontFamily: "GothamBold",
+                          ),
+                        ),
+                        TextSpan(
+                          text: viewText,
+                          style: TextStyle(
+                            fontFamily: "GothamBook",
+                            color: gSecondaryColor,
+                            fontSize: 9.sp,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()..onTap = func,
+                        ),
+                      ]),
+                ),
         ],
       ),
     );
   }
-
-
 }

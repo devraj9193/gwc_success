@@ -119,7 +119,7 @@ class _DirectBridgedScreenState extends State<DirectBridgedScreen> {
                             ],
                           ),
                         ),
-                        const PopUpMenuWidget(),
+                         PopUpMenuWidget(onView: () {  }, onCall: () {  }, onMessage: () {  },),
                       ],
                     ),
                     Container(
@@ -198,7 +198,7 @@ class _DirectBridgedScreenState extends State<DirectBridgedScreen> {
                             ],
                           ),
                         ),
-                        const PopUpMenuWidget(),
+                         PopUpMenuWidget(onView: () {  }, onCall: () {  }, onMessage: () {  },),
                       ],
                     ),
                     Container(

@@ -336,48 +336,51 @@ class _SuccessLoginState extends State<SuccessLogin> {
       setState(() {
         isLoading = true;
       });
-     // try {
-        Map<String, dynamic> dataBody = {
-          "email": emailController.text.toString(),
-          "password": passwordController.text.toString(),
-        };
-        print(dataBody);
-        var response =
-            await http.post(Uri.parse(GwcApi.loginApiUrl), body: dataBody);
-        if (response.statusCode == 200) {
+      // try {
+      Map<String, dynamic> dataBody = {
+        "email": emailController.text.toString(),
+        "password": passwordController.text.toString(),
+      };
+      print(dataBody);
+      var response =
+          await http.post(Uri.parse(GwcApi.loginApiUrl), body: dataBody);
+      print("login: ${response.body}");
+      if (response.statusCode == 200) {
+        setState(() {
+          isLoading = true;
+        });
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        saveData(
+          responseData["access_token"],
+          responseData["user"]["login_username"].toString(),
+          responseData["user"]["chat_id"],
+        );
+        print("Token : ${responseData["access_token"]}");
+        if (responseData['status'] == 200) {
           setState(() {
             isLoading = true;
           });
-          Map<String, dynamic> responseData = jsonDecode(response.body);
-          saveData(responseData["access_token"]);
-          print("Token : ${responseData["access_token"]}");
-          if (responseData['status'] == 200) {
-            setState(() {
-              isLoading = true;
-            });
-            Get.to(() => const DashboardScreen());
-            buildSnackBar("Login", "Successful");
-          }
-          else if (responseData['status'] == 401) {
-            setState(() {
-              isLoading = false;
-            });
-            buildSnackBar("Login Failed", responseData['message']);
-          }
-        } else {
+          Get.to(() => const DashboardScreen());
+          buildSnackBar("Login", "Successful");
+        } else if (responseData['status'] == 401) {
           setState(() {
             isLoading = false;
           });
-          buildSnackBar("Login Failed", "API Problem");
+          buildSnackBar("Login Failed", responseData['message']);
         }
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        buildSnackBar("Login Failed", "API Problem");
+      }
       // } catch (e) {
       //   setState(() {
       //     isLoading = false;
       //   });
       //   throw Exception(e);
       // }
-    }
-    else {
+    } else {
       setState(() {
         isLoading = false;
       });
@@ -385,8 +388,10 @@ class _SuccessLoginState extends State<SuccessLogin> {
     }
   }
 
-  saveData(String token) async {
+  saveData(String token, String chatUserName, String chatUserId) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.setString("token", token);
+    preferences.setString("chatUserName", chatUserName);
+    preferences.setString("chatUserId", chatUserId);
   }
 }

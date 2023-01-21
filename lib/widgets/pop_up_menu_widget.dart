@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gwc_success_team/screens/common_ui/show_profile.dart';
 import 'package:sizer/sizer.dart';
-import '../screens/common_ui/message_screen.dart';
+import '../screens/message_screen/message_screen.dart';
 import '../utils/constants.dart';
 
 class PopUpMenuWidget extends StatefulWidget {
-  const PopUpMenuWidget({Key? key}) : super(key: key);
+  final VoidCallback onView;
+  final VoidCallback onCall;
+  final VoidCallback onMessage;
+
+  const PopUpMenuWidget({Key? key, required this.onView, required this.onCall, required this.onMessage}) : super(key: key);
 
   @override
   State<PopUpMenuWidget> createState() => _PopUpMenuWidgetState();
@@ -23,8 +26,7 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
       child: PopupMenuButton(
         onSelected: null,
         offset: const Offset(0, 30),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         itemBuilder: (context) => [
           PopupMenuItem(
             child: Column(
@@ -32,19 +34,11 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
               children: [
                 SizedBox(height: 1.h),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ct) =>
-                        const ShowProfile(),
-                      ),
-                    ).then((value) => Navigator.pop(context));
-                  },
+                  onTap: widget.onView,
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 4),
                     child: Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           "View",
@@ -54,7 +48,7 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
                               fontSize: 9.sp),
                         ),
                         SvgPicture.asset(
-                            "assets/images/noun-view-1041859.svg",
+                          "assets/images/noun-view-1041859.svg",
                           width: 7.sp,
                           height: 7.sp,
                         )
@@ -68,17 +62,9 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
                   color: gGreyColor.withOpacity(0.3),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (ct) =>
-                    //     const MessageScreen(),
-                    //   ),
-                    // );
-                  },
-                  child: Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
+                  onTap: widget.onCall,
+                    child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "Call",
@@ -88,8 +74,7 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
                             fontSize: 9.sp),
                       ),
                       Image(
-                        image: const AssetImage(
-                            "assets/images/Group 4890.png"),
+                        image: const AssetImage("assets/images/Group 4890.png"),
                         height: 2.h,
                       ),
                     ],
@@ -101,17 +86,9 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
                   color: gGreyColor.withOpacity(0.3),
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ct) =>
-                        const MessageScreen(),
-                      ),
-                    );
-                  },
+                  onTap: widget.onMessage,
                   child: Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "Message",
@@ -121,8 +98,7 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
                             fontSize: 9.sp),
                       ),
                       Image(
-                        image: const AssetImage(
-                            "assets/images/Group 4891.png"),
+                        image: const AssetImage("assets/images/Group 4891.png"),
                         height: 2.h,
                       ),
                     ],

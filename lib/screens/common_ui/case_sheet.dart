@@ -4,48 +4,43 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../../utils/constants.dart';
 import '../../widgets/widgets.dart';
 
-
-class CaseSheet extends StatefulWidget {
-  const CaseSheet({Key? key}) : super(key: key);
+class CaseSheetDetails extends StatefulWidget {
+  final String report;
+  const CaseSheetDetails({Key? key, required this.report}) : super(key: key);
 
   @override
-  State<CaseSheet> createState() => _CaseSheetState();
+  State<CaseSheetDetails> createState() => _CaseSheetDetailsState();
 }
 
-class _CaseSheetState extends State<CaseSheet> {
+class _CaseSheetDetailsState extends State<CaseSheetDetails> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                buildAppBar(() {
-                  Navigator.pop(context);
-                }),
-                SizedBox(
-                  height: 3.h,
-                ),
-                Text(
-                  "Case Sheet",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontFamily: 'GothamRoundedBold_21016',
-                      color: gPrimaryColor,
-                      fontSize: 12.sp),
-                ),
-                SfPdfViewer.network("src")
-              ],
-            ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildAppBar(() {
+                Navigator.pop(context);
+              }),
+           //   SizedBox(height: 1.h),
+              Text(
+                "Case Sheet",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: 'GothamBold',
+                    color: gPrimaryColor,
+                    fontSize: 11.sp),
+              ),
+              SizedBox(height: 1.h),
+              Expanded(child: SfPdfViewer.network(widget.report),),
+            ],
           ),
         ),
       ),
     );
   }
-
 }

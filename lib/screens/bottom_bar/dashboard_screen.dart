@@ -3,6 +3,7 @@ import 'package:gwc_success_team/screens/profile_screens/settings_screen.dart';
 
 import '../../widgets/will_pop_widget.dart';
 import '../dashboard/calender_screen.dart';
+import '../dashboard/notification_screen.dart';
 import '../reports/direct_bridged_screen.dart';
 import '../teams/gwc_teams_screen.dart';
 import 'bottom_bar.dart';
@@ -33,6 +34,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       case 3:
         {
+          return const NotificationScreen();
+        }
+      case 4:
+        {
           return const SettingsScreen();
         }
     }
@@ -44,8 +49,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: SafeArea(
         child: Scaffold(
           body: pageCaller(_bottomNavIndex),
-          bottomNavigationBar:
-          BottomBar(
+          bottomNavigationBar: BottomBar(
             index: _bottomNavIndex,
             onChangedTab: onChangedTab,
           ),

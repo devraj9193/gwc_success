@@ -1,13 +1,21 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../controller/calendar_details_controller.dart';
-import '../../model/calendar_model.dart';
-import '../../utils/constants.dart';
-import '../../widgets/widgets.dart';
-import 'consultation_pending_screen.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import '../../model/calendar_model.dart';
+import '../../model/customers_list_model.dart';
+import '../../utils/constants.dart';
+import '../../utils/gwc_api.dart';
+import '../../widgets/widgets.dart';
+import '../common_ui/show_profile.dart';
+import '../post_programs_screens/post_programs_screen.dart';
+import '../shipping_screens/shipping_pending_screen.dart';
+import 'active_consultation_screen.dart';
+import 'notification_screen.dart';
+import 'consultation_pending_screen.dart';
 
 class CalenderScreen extends StatefulWidget {
   const CalenderScreen({Key? key}) : super(key: key);
@@ -18,6 +26,8 @@ class CalenderScreen extends StatefulWidget {
 
 class _CalenderScreenState extends State<CalenderScreen> {
   final searchController = TextEditingController();
+  CustomersList? customersList;
+  List searchResults = [];
 
   @override
   void initState() {
@@ -35,22 +45,22 @@ class _CalenderScreenState extends State<CalenderScreen> {
 
   List doctorDetails = [
     {
-      "title": "Consultations Pending's",
+      "title": "Consultations",
       "image": "assets/images/Group 3009.png",
       "id": "1",
     },
     {
-      "title": "Shipping Pending's",
+      "title": "Shipping",
       "image": "assets/images/Group 3371.png",
       "id": "2",
     },
     {
-      "title": "Active Consultation",
+      "title": "Active",
       "image": "assets/images/Group 3011.png",
       "id": "3",
     },
     {
-      "title": "Post\nProgram",
+      "title": "Post Program",
       "image": "assets/images/Group 3013.png",
       "id": "4",
     },
@@ -59,56 +69,85 @@ class _CalenderScreenState extends State<CalenderScreen> {
   CalendarDetailsController calendarDetailsController =
       Get.put(CalendarDetailsController());
 
+  Future<List<Datum>?> fetchCustomersList() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var token = preferences.getString("token")!;
+
+    final response =
+        await http.get(Uri.parse(GwcApi.customersListApiUrl), headers: {
+      'Authorization': 'Bearer $token',
+    });
+    if (response.statusCode == 200) {
+      print("status: ${response.body}");
+      CustomersList jsonData = customersListFromJson(response.body);
+      List<Datum>? arrData = jsonData.data;
+      return arrData;
+    } else {
+      throw Exception();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        extendBody: true,
-        body: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 8.h,
-                child: const Image(
-                  image:
-                      AssetImage("assets/images/Gut wellness logo green.png"),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  height: 8.h,
+                  child: const Image(
+                    image:
+                        AssetImage("assets/images/Gut wellness logo green.png"),
+                  ),
                 ),
-              ),
-              buildSearchWidget(),
-              searchController.text.isEmpty
-                  ? Column(
-                      children: [
-                        SizedBox(height: 2.h),
-                        buildCalender(),
-                        buildDetails(),
-                        SizedBox(height: 1.h)
-                      ],
-                    )
-                  : Container(),
-            ],
-          ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ct) => const NotificationScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    color: gMainColor,
+                  ),
+                ),
+              ],
+            ),
+            buildSearchWidget(),
+            SizedBox(height: 1.h),
+            searchController.text.isEmpty
+                ? Expanded(child: buildCalender())
+                : Expanded(child: buildSearchList()),
+            searchController.text.isEmpty ? buildDetails() : Container(),
+            SizedBox(height: 1.h)
+            //  searchController.text.isEmpty ? buildSearch() : Container(),
+          ],
         ),
       ),
     );
   }
 
-  buildSearchWidget() {
+   buildSearchWidget() {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         color: Colors.white,
-        border: Border.all(color: gMainColor, width: 1.0),
+        border: Border.all(color: gMainColor.withOpacity(0.5), width: 1.0),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
-            blurRadius: 5,
+            blurRadius: 2,
           ),
         ],
       ),
       padding: EdgeInsets.symmetric(horizontal: 2.w),
-      margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
+      margin: EdgeInsets.symmetric(horizontal: 5.w),
       child: TextFormField(
         textAlignVertical: TextAlignVertical.center,
         controller: searchController,
@@ -140,10 +179,92 @@ class _CalenderScreenState extends State<CalenderScreen> {
         style: TextStyle(
             fontFamily: "GothamBook", color: gMainColor, fontSize: 11.sp),
         onChanged: (value) {
-          //  onSearchTextChanged(value, setState);
+          onSearchTextChanged(value);
         },
       ),
     );
+  }
+
+  buildSearchList() {
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
+        decoration: BoxDecoration(
+          color: gWhiteColor,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 2,
+              color: Colors.grey.withOpacity(0.5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: 1,
+              color: Colors.grey.withOpacity(0.3),
+            ),
+            SizedBox(height: 2.h),
+            ListView.builder(
+              scrollDirection: Axis.vertical,
+              padding: EdgeInsets.symmetric(horizontal: 1.w),
+              physics: const ScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: searchResults.length,
+              itemBuilder: ((context, index) {
+                print("len: ${searchResults.length}");
+                return Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        saveUserId(searchResults[index].id.toString());
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const ShowProfile(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "${searchResults[index].fname ?? ""} ${searchResults[index].lname ?? ""}",
+                        style: TextStyle(
+                            fontFamily: "GothamMedium",
+                            color: gBlackColor,
+                            fontSize: 10.sp),
+                      ),
+                    ),
+                    Container(
+                      height: 1,
+                      margin: EdgeInsets.symmetric(vertical: 1.5.h),
+                      color: Colors.grey.withOpacity(0.3),
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  onSearchTextChanged(String text) async {
+    searchResults.clear();
+    if (text.isEmpty) {
+      setState(() {});
+      return;
+    }
+    customersList?.data?.forEach((userDetail) {
+      if (userDetail.fname!.toLowerCase().contains(text.trim().toLowerCase())) {
+        searchResults.add(userDetail);
+      }
+    });
+    setState(() {});
+  }
+
+  saveUserId(String userId) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString("user_id", userId);
   }
 
   buildCalender() {
@@ -156,40 +277,41 @@ class _CalenderScreenState extends State<CalenderScreen> {
             );
           } else if (snapshot.hasData) {
             var data = snapshot.data;
-            return SizedBox(
-              width: double.maxFinite,
-              height: 100.h,
-              child: SfCalendar(
-                view: CalendarView.week,
-                showDatePickerButton: true,
-                showWeekNumber: false,
-                showNavigationArrow: true,
-                showCurrentTimeIndicator: true,
-                allowViewNavigation: true,
-                allowDragAndDrop: false,
-                dataSource: MeetingDataSource(_getDataSource(data)),
-                headerStyle: CalendarHeaderStyle(
-                  textAlign: TextAlign.center,
-                  textStyle: TextStyle(
-                    fontFamily: "GothamMedium",
-                    color: gTextColor,
-                    fontSize: 10.sp,
-                  ),
-                ),
-                viewHeaderStyle: ViewHeaderStyle(
-                  dayTextStyle: TextStyle(
-                    fontFamily: "GothamBold",
-                    color: gTextColor,
-                    fontSize: 10.sp,
-                  ),
-                  dateTextStyle: TextStyle(
-                    fontFamily: "GothamBook",
-                    color: gTextColor,
-                    fontSize: 10.sp,
-                  ),
-                ),
-                todayHighlightColor: gSecondaryColor,
+            return SfCalendar(
+              view: CalendarView.week,
+              showDatePickerButton: true,
+              timeSlotViewSettings: const TimeSlotViewSettings(
+                startHour: 8,
+                endHour: 22,
+                nonWorkingDays: <int>[DateTime.friday, DateTime.monday],
               ),
+              showWeekNumber: false,
+              showNavigationArrow: true,
+              showCurrentTimeIndicator: true,
+              allowViewNavigation: true,
+              allowDragAndDrop: false,
+              dataSource: MeetingDataSource(_getDataSource(data)),
+              headerStyle: CalendarHeaderStyle(
+                textAlign: TextAlign.center,
+                textStyle: TextStyle(
+                  fontFamily: "GothamMedium",
+                  color: gTextColor,
+                  fontSize: 10.sp,
+                ),
+              ),
+              viewHeaderStyle: ViewHeaderStyle(
+                dayTextStyle: TextStyle(
+                  fontFamily: "GothamBold",
+                  color: gTextColor,
+                  fontSize: 9.sp,
+                ),
+                dateTextStyle: TextStyle(
+                  fontFamily: "GothamBook",
+                  color: gTextColor,
+                  fontSize: 9.sp,
+                ),
+              ),
+              todayHighlightColor: gSecondaryColor,
             );
           }
           return Padding(
@@ -216,9 +338,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 13,
-          mainAxisExtent: 13.h,
+          crossAxisSpacing: 5,
+          mainAxisSpacing: 10,
+          mainAxisExtent: 6.h,
         ),
         itemCount: doctorDetails.length,
         itemBuilder: (context, index) {
@@ -231,28 +353,26 @@ class _CalenderScreenState extends State<CalenderScreen> {
                   ),
                 );
               } else if (doctorDetails[index]["id"] == "2") {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (ct) => const MealPlansScreen(),
-                //   ),
-                // );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ct) => const ShippingPendingScreen(),
+                  ),
+                );
               } else if (doctorDetails[index]["id"] == "3") {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (ct) => const ActiveScreen(),
-                //   ),
-                // );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ct) => const ActiveConsultationScreen(),
+                  ),
+                );
               } else if (doctorDetails[index]["id"] == "4") {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (ct) => const PostProgramsScreen(),
-                //   ),
-                // );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ct) => const PostProgramsScreen(),
+                  ),
+                );
               }
             },
             child: Container(
-                padding: EdgeInsets.only(
-                    top: 1.5.h, left: 4.w, right: 10.w, bottom: 1.h),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
                   color: gPrimaryColor,
@@ -265,22 +385,21 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     ),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image(
-                      height: 5.h,
+                      height: 3.h,
                       image: AssetImage(doctorDetails[index]["image"]),
                       color: gMainColor,
                     ),
-                    SizedBox(height: 1.h),
+                    SizedBox(width: 2.w),
                     Text(
                       doctorDetails[index]["title"],
                       style: TextStyle(
-                        height: 1,
                         fontFamily: "GothamMedium",
                         color: gMainColor,
-                        fontSize: 11.sp,
+                        fontSize: 10.sp,
                       ),
                     ),
                   ],
