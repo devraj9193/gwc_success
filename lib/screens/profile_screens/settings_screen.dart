@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gwc_success_team/screens/login_screen/success_login.dart';
-import 'package:gwc_success_team/screens/profile_screens/terms_conditions_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-import '../../controller/user_profile_controller.dart';
 import '../../utils/constants.dart';
+import '../../utils/gwc_api.dart';
+import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
-import 'faq_screen.dart';
 import 'my_profile_details.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -18,134 +17,103 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  UserProfileController userProfileController =
-      Get.put(UserProfileController());
+  final SharedPreferences _pref = GwcApi.preferences!;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: dashboardAppBar(),
+        backgroundColor: whiteTextColor,
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
-            child: FutureBuilder(
-                future: userProfileController.fetchUserProfile(),
-                builder:
-                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.hasError) {
-                  } else if (snapshot.hasData) {
-                    var data = snapshot.data;
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "My Profile",
+                  textAlign: TextAlign.center,
+                  style: ProfileScreenText().headingText(),
+                ),
+                SizedBox(height: 2.h),
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const MyProfileDetails(),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 3.h,
+                        backgroundImage: NetworkImage(
+                          "${_pref.getString(GwcApi.successMemberProfile)}",
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 2.w),
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildAppBar(() {
-                          Navigator.pop(context);
-                        }),
-                        Text(
-                          "My Profile",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontFamily: 'GothamBold',
-                              color: gPrimaryColor,
-                              fontSize: 12.sp),
-                        ),
-                        SizedBox(height: 2.h),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const MyProfileDetails(),
-                                  ),
-                                );
-                              },
-                              child: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                  data.data.profile.toString(),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 2.w),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data.data.name ?? "",
-                                  style: TextStyle(
-                                    color: kTextColor,
-                                    fontFamily: 'GothamMedium',
-                                    fontSize: 10.sp,
-                                  ),
-                                ),
-                                SizedBox(height: 0.6.h),
-                                Text(
-                                  data.data.address ?? "Bangalore",
-                                  style: TextStyle(
-                                    color: kTextColor,
-                                    fontFamily: 'GothamBook',
-                                    fontSize: 9.sp,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 2.h),
-                        profileTile(
-                            "assets/images/Group 2753.png", "My Profile", () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const MyProfileDetails(),
-                            ),
-                          );
-                        }),
-                        // Container(
-                        //   height: 1,
-                        //   color: Colors.grey.withOpacity(0.3),
-                        // ),
-                        // profileTile("assets/images/Group 2747.png", "FAQ", () {
-                        //   Navigator.of(context).push(
-                        //     MaterialPageRoute(
-                        //       builder: (context) => const FaqScreen(),
-                        //     ),
-                        //   );
-                        // }),
-                        // Container(
-                        //   height: 1,
-                        //   color: Colors.grey.withOpacity(0.3),
-                        // ),
-                        // profileTile("assets/images/Group 2748.png",
-                        //     "Terms & Conditions", () {
-                        //   Navigator.of(context).push(
-                        //     MaterialPageRoute(
-                        //       builder: (context) =>
-                        //           const TermsConditionsScreen(),
-                        //     ),
-                        //   );
-                        // }),
-                        Container(
-                          height: 1,
-                          color: Colors.grey.withOpacity(0.3),
-                        ),
-                        profileTile("assets/images/Group 2744.png", "Logout",
-                            () {
-                          dialog(context);
-                        }),
-                        Container(
-                          height: 1,
-                          color: Colors.grey.withOpacity(0.3),
-                        ),
+                        Text("${_pref.getString(GwcApi.successMemberName)}",
+                            style: ProfileScreenText().nameText()),
+                        SizedBox(height: 0.6.h),
+                        Text("${_pref.getString(GwcApi.successMemberAddress)}",
+                            style: ProfileScreenText().otherText()),
                       ],
-                    );
-                  }
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20.h),
-                    child: buildCircularIndicator(),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 2.h),
+                profileTile("assets/images/Group 2753.png", "My Profile", () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const MyProfileDetails(),
+                    ),
                   );
                 }),
+                // Container(
+                //   height: 1,
+                //   color: Colors.grey.withOpacity(0.3),
+                // ),
+                // profileTile("assets/images/Group 2747.png", "FAQ", () {
+                //   Navigator.of(context).push(
+                //     MaterialPageRoute(
+                //       builder: (context) => const FaqScreen(),
+                //     ),
+                //   );
+                // }),
+                // Container(
+                //   height: 1,
+                //   color: Colors.grey.withOpacity(0.3),
+                // ),
+                // profileTile("assets/images/Group 2748.png",
+                //     "Terms & Conditions", () {
+                //   Navigator.of(context).push(
+                //     MaterialPageRoute(
+                //       builder: (context) =>
+                //           const TermsConditionsScreen(),
+                //     ),
+                //   );
+                // }),
+                Container(
+                  height: 1,
+                  color: Colors.grey.withOpacity(0.3),
+                ),
+                profileTile("assets/images/Group 2744.png", "Logout", () {
+                  dialog(context);
+                }),
+                Container(
+                  height: 1,
+                  color: Colors.grey.withOpacity(0.3),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -166,18 +134,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             child: Image(
               image: AssetImage(image),
-              height: 3.h,
+              height: 4.h,
             ),
           ),
           SizedBox(width: 3.w),
           Expanded(
             child: Text(
               title,
-              style: TextStyle(
-                color: kTextColor,
-                fontFamily: 'GothamMedium',
-                fontSize: 10.sp,
-              ),
+              style: ProfileScreenText().subHeadingText(),
             ),
           ),
           GestureDetector(
@@ -185,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Icon(
               Icons.arrow_forward_ios,
               color: gBlackColor,
-              size: 2.h,
+              size: 1.8.h,
             ),
           ),
         ],
@@ -205,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           decoration: BoxDecoration(
             color: gWhiteColor,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: gMainColor, width: 1),
+            border: Border.all(color: lightTextColor, width: 1),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -215,18 +179,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Text(
                 "Log Out ?",
                 style: TextStyle(
-                  color: gTextColor,
-                  fontFamily: "GothamMedium",
-                  fontSize: 11.sp,
+                  color: newBlackColor,
+                  fontFamily: fontBold,
+                  fontSize: fontSize11,
                 ),
               ),
               SizedBox(height: 2.h),
               Text('Are you sure you want to log out?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontFamily: "GothamBook",
-                    color: gTextColor,
-                    fontSize: 11.sp,
+                    fontFamily: fontBook,
+                    color: newBlackColor,
+                    fontSize: fontSize10,
                   )),
               SizedBox(height: 2.5.h),
               Row(
@@ -239,13 +203,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         decoration: BoxDecoration(
                           color: gWhiteColor,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: gMainColor),
+                          border: Border.all(color: lightTextColor),
                         ),
                         child: Text("Cancel",
                             style: TextStyle(
-                              color: gPrimaryColor,
-                              fontFamily: "GothamMedium",
-                              fontSize: 9.sp,
+                              color: newBlackColor,
+                              fontFamily: fontMedium,
+                              fontSize: fontSize09,
                             ))),
                   ),
                   SizedBox(width: 3.w),
@@ -261,15 +225,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 9.w, vertical: 1.h),
                         decoration: BoxDecoration(
-                          color: gPrimaryColor,
+                          color: gSecondaryColor,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: gMainColor),
+                          // border: Border.all(color: gMainColor),
                         ),
                         child: Text("Log Out",
                             style: TextStyle(
-                              color: gMainColor,
-                              fontFamily: "GothamMedium",
-                              fontSize: 9.sp,
+                              color: whiteTextColor,
+                              fontFamily: fontMedium,
+                              fontSize: fontSize09,
                             ))),
                   )
                 ],

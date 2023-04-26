@@ -17,6 +17,11 @@ class _FaqScreenState extends State<FaqScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: buildAppBar(() {
+          Navigator.pop(context);
+        }),
+        backgroundColor: whiteTextColor,
+
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
@@ -25,9 +30,7 @@ class _FaqScreenState extends State<FaqScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildAppBar(() {
-                  Navigator.pop(context);
-                }),
+
                 SizedBox(height: 1.h),
                 Text(
                   "FAQ",

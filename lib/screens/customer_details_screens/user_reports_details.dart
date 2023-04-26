@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../controller/mr_reports_controller.dart';
 import '../../utils/constants.dart';
+import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
 
 class UserReportsDetails extends StatefulWidget {
@@ -30,8 +32,12 @@ class _UserReportsDetailsState extends State<UserReportsDetails> {
               future: mrReportsController.fetchMRReportsList(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                 if (snapshot.hasError) {
-                  return Center(
-                    child: Text(snapshot.error.toString()),
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: 7.h),
+                    child: Image(
+                      image: const AssetImage("assets/images/Group 5294.png"),
+                      height: 35.h,
+                    ),
                   );
                 } else if (snapshot.hasData) {
                   var data = snapshot.data;
@@ -43,15 +49,30 @@ class _UserReportsDetailsState extends State<UserReportsDetails> {
                     itemBuilder: ((context, index) {
                       return GestureDetector(
                         onTap: () async {
-                          final url = data[index].report.toString();
-                          if (await canLaunch(url)) {
-                            await launch(
-                              url,
-                              //forceSafariVC: true,
-                              // forceWebView: true,
-                              // enableJavaScript: true,
-                            );
+                          print(data[index].report.toString());
+                          final a = data[index].report;
+                          final file = a.split(".").last;
+                          String format = file.toString();
+                          print(format); //prints dart
+                          if (format == "jpg" ||
+                              format == "png" ||
+                              format == "gif") {
+                            openJPGFile(a, context);
+                          } else if (format == "pdf") {
+                            openPDFFile(a, context);
+                          } else {
+                            buildSnackBar(
+                                "Failed", "Invalid File Format",);
                           }
+                          // final url = data[index].report.toString();
+                          // if (await canLaunch(url)) {
+                          //   await launch(
+                          //     url,
+                          //     //forceSafariVC: true,
+                          //     // forceWebView: true,
+                          //     // enableJavaScript: true,
+                          //   );
+                          // }
                         },
                         child: Container(
                           margin: EdgeInsets.symmetric(
@@ -73,7 +94,7 @@ class _UserReportsDetailsState extends State<UserReportsDetails> {
                               Image(
                                 height: 4.h,
                                 image:
-                                    const AssetImage("assets/images/pdf.png"),
+                                const AssetImage("assets/images/pdf.png"),
                               ),
                               SizedBox(width: 3.w),
                               Expanded(
@@ -91,9 +112,9 @@ class _UserReportsDetailsState extends State<UserReportsDetails> {
                                       maxLines: 2,
                                       style: TextStyle(
                                           height: 1.2,
-                                          fontFamily: "GothamMedium",
-                                          color: gPrimaryColor,
-                                          fontSize: 9.sp),
+                                          fontFamily: fontBook,
+                                          color: newBlackColor,
+                                          fontSize: fontSize09),
                                     ),
                                     // SizedBox(height: 1.h),
                                     // Text(
@@ -109,7 +130,7 @@ class _UserReportsDetailsState extends State<UserReportsDetails> {
                               SizedBox(width: 3.w),
                               Icon(
                                 Icons.arrow_forward_ios_outlined,
-                                color: gMainColor,
+                                color: newBlackColor,
                                 size: 2.h,
                               ),
                             ],
@@ -125,6 +146,151 @@ class _UserReportsDetailsState extends State<UserReportsDetails> {
                 );
               }),
         ],
+      ),
+    );
+  }
+
+  void openJPGFile(String file, BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          margin: EdgeInsets.only(top: 10.h),
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
+          decoration: const BoxDecoration(
+            color: gWhiteColor,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 1.h),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'User Reports',
+                          style: TabBarText().bottomSheetHeadingText(),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: mediumTextColor, width: 1),
+                        ),
+                        child: Icon(
+                          Icons.clear,
+                          color: mediumTextColor,
+                          size: 1.6.h,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5)
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 10.w),
+                height: 1,
+                color: lightTextColor,
+              ),
+              Expanded(
+                child: FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/progress_logo.png',
+                  placeholderCacheHeight: 80,
+                  placeholderCacheWidth: 50,
+                  image: file,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void openPDFFile(String file, BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          margin: EdgeInsets.only(top: 10.h),
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
+          decoration: const BoxDecoration(
+            color: gWhiteColor,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: 1.h),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          'User Reports',
+                          style: TabBarText().bottomSheetHeadingText(),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(color: mediumTextColor, width: 1),
+                        ),
+                        child: Icon(
+                          Icons.clear,
+                          color: mediumTextColor,
+                          size: 1.6.h,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 5)
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 10.w),
+                height: 1,
+                color: lightTextColor,
+              ),
+              Expanded(
+                child: SfPdfViewer.network(
+                  file,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

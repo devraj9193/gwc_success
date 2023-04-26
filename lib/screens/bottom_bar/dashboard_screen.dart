@@ -4,8 +4,8 @@ import 'package:gwc_success_team/screens/profile_screens/settings_screen.dart';
 import '../../widgets/will_pop_widget.dart';
 import '../dashboard/calender_screen.dart';
 import '../dashboard/notification_screen.dart';
-import '../reports/direct_bridged_screen.dart';
-import '../teams/gwc_teams_screen.dart';
+import '../direct_bridged/direct_bridged_screen.dart';
+import '../gwc_teams/gwc_teams_screen.dart';
 import 'bottom_bar.dart';
 
 class DashboardScreen extends StatefulWidget {

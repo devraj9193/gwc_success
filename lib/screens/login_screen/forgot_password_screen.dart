@@ -16,6 +16,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: buildAppBar(() {
+          Navigator.pop(context);
+        }),
+        backgroundColor: whiteTextColor,
+
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
@@ -28,9 +33,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    buildAppBar(() {
-                      Navigator.pop(context);
-                    }),
+
                     Text(
                       "Forgot Password",
                       textAlign: TextAlign.center,

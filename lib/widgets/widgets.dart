@@ -4,7 +4,9 @@ import 'package:im_animations/im_animations.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
 import '../controller/customer_call_controller.dart';
+import '../screens/dashboard/notification_screen.dart';
 import '../utils/constants.dart';
+import 'common_screen_widgets.dart';
 
 CustomerCallController callController = Get.put(CustomerCallController());
 
@@ -68,27 +70,90 @@ SnackbarController buildSnackBar(String title, String subTitle) {
   );
 }
 
-Row buildAppBar(VoidCallback func) {
-  return Row(
-    children: [
-      SizedBox(
-        height: 2.h,
+AppBar dashboardAppBar() {
+  return AppBar(
+    automaticallyImplyLeading: false,
+    centerTitle: false,
+    elevation: 0,
+    backgroundColor: gWhiteColor,
+    title: SizedBox(
+      height: 5.h,
+      child: const Image(
+        image: AssetImage("assets/images/Gut wellness logo.png"),
+      ),
+    ),
+    actions: [
+      Padding(
+        padding: EdgeInsets.only(right: 3.w),
         child: InkWell(
-          onTap: func,
-          child: const Image(
-            image: AssetImage("assets/images/Icon ionic-ios-arrow-back.png"),
+          child: const Icon(
+            Icons.notifications_none_sharp,
+            color: gBlackColor,
           ),
+          onTap: () {
+            Get.to(() => const NotificationScreen());
+          },
         ),
-      ),
-      SizedBox(
-        height: 8.h,
-        child: const Image(
-          image: AssetImage("assets/images/Gut wellness logo green.png"),
-        ),
-      ),
+      )
     ],
   );
 }
+
+
+AppBar buildAppBar(VoidCallback func) {
+  return AppBar(
+    backgroundColor: gWhiteColor,
+    centerTitle: false,
+    automaticallyImplyLeading: false,
+    elevation: 0,
+    title: Row(
+      children: [
+        GestureDetector(
+          onTap: func,
+          child: Icon(
+            Icons.arrow_back_ios_new_sharp,
+            color: gSecondaryColor,
+            size: 2.h,
+          ),
+        ),
+        SizedBox(width: 2.w),
+        SizedBox(
+          height: 5.h,
+          child: const Image(
+            image: AssetImage("assets/images/Gut wellness logo.png"),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+buildLabelTextField(String name) {
+  return RichText(
+      text: TextSpan(
+          text: name,
+          style: EvaluationText().questionText(),
+          children: [
+            TextSpan(
+              text: ' *',
+              style: TextStyle(
+                height: 1.5,
+                fontSize: fontSize09,
+                color: newSecondaryColor,
+                fontFamily: fontMedium,
+              ),
+            )
+          ]));
+  // return Text(
+  //   'Full Name:*',
+  //   style: TextStyle(
+  //     fontSize: 9.sp,
+  //     color: kTextColor,
+  //     fontFamily: "PoppinsSemiBold",
+  //   ),
+  // );
+}
+
 
 Center buildCircularIndicator() {
   return Center(
@@ -137,90 +202,41 @@ fixedSnackbar(BuildContext context, String message, String btnName, onPress,
   );
 }
 
-void dialog(BuildContext context) {
-  showDialog(
-    barrierDismissible: false,
-    barrierColor: gWhiteColor.withOpacity(0.8),
-    context: context,
-    builder: (context) => Center(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 5.w),
-        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.h),
-        decoration: BoxDecoration(
-          color: gWhiteColor,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: gMainColor, width: 1),
-        ),
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.start,
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              "Call",
-              style: TextStyle(
-                color: gPrimaryColor,
-                fontFamily: "GothamMedium",
-                fontSize: 11.sp,
-              ),
-            ),
-            SizedBox(height: 2.h),
-            Align(
-              alignment: Alignment.topLeft,
-              child: Text('Are you sure you want to call?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: "GothamBook",
-                    color: gMainColor,
-                    fontSize: 11.sp,
-                  )),
-            ),
-            SizedBox(height: 4.h),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    callController.fetchCustomersCall();
-                    Get.back();
-                  },
-                  child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 9.w, vertical: 1.h),
-                      decoration: BoxDecoration(
-                        color: gPrimaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: gMainColor),
-                      ),
-                      child: Text("Call",
-                          style: TextStyle(
-                            color: gMainColor,
-                            fontFamily: "GothamMedium",
-                            fontSize: 9.sp,
-                          ))),
-                ),
-                SizedBox(width: 3.w),
-                GestureDetector(
-                  onTap: () => Navigator.of(context).pop(false),
-                  child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 9.w, vertical: 1.h),
-                      decoration: BoxDecoration(
-                        color: gWhiteColor,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: gMainColor),
-                      ),
-                      child: Text("Cancel",
-                          style: TextStyle(
-                            color: gPrimaryColor,
-                            fontFamily: "GothamMedium",
-                            fontSize: 9.sp,
-                          ))),
-                ),
-              ],
-            ),
-          ],
+trailIcons(
+    {required VoidCallback callOnTap, required VoidCallback chatOnTap}) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      GestureDetector(
+        onTap: callOnTap,
+        child: Image.asset(
+          'assets/images/Group 4890.png',
+          height: 2.h,
+          width: 2.h,
+          color: gBlackColor,
         ),
       ),
+      SizedBox(width: 4.w),
+      GestureDetector(
+        onTap: chatOnTap,
+        child: Image.asset(
+          'assets/images/Group 4891.png',
+          height: 2.5.h,
+          width: 2.5.h,
+          color: gBlackColor,
+        ),
+      ),
+    ],
+  );
+}
+
+Padding buildNoData() {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 15.h),
+    child: Image(
+      image: const AssetImage("assets/images/Group 5294.png"),
+      height: 25.h,
     ),
   );
 }
@@ -256,12 +272,12 @@ List<String> dailyProgress = [
   "5",
   "6",
   "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "13",
-  "14",
-  "15",
+  // "8",
+  // "9",
+  // "10",
+  // "11",
+  // "12",
+  // "13",
+  // "14",
+  // "15",
 ];

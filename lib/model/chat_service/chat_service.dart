@@ -13,4 +13,8 @@ class ChatService extends ChangeNotifier{
   Future getGwcTeamChatGroupIdService(String userId) async{
     return await repository.getGwcTeamChatGroupIdRepo(userId);
   }
+
+  Future getAccessToken(String kaleyraUID) async{
+    return await repository.getAccessTokenRepo(kaleyraUID);
+  }
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../model/user_profile_model.dart';
 import '../utils/gwc_api.dart';
@@ -11,18 +10,15 @@ class UserProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchUserProfile();
+    fetchUserProfile;
   }
 
-  Future<GetUserModel> fetchUserProfile() async {
+  Future<GetUserModel> fetchUserProfile(String accessToken) async {
     dynamic res;
-
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    var token = preferences.getString("token")!;
 
     final response =
         await http.get(Uri.parse(GwcApi.getUserProfileApiUrl), headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $accessToken',
     });
     print("User Response: ${response.body}");
     if (response.statusCode == 200) {

@@ -36,7 +36,7 @@ class _BottomBarState extends State<BottomBar> {
               index: 0,
               image: 'assets/images/dashboard.png',
             ),
-            buildTabView1(
+            buildTabView(
               index: 1,
               image: 'assets/images/teams_bottom.png',
             ),
@@ -44,9 +44,9 @@ class _BottomBarState extends State<BottomBar> {
               index: 2,
               image: 'assets/images/chat_bottom.png',
             ),
-            buildTabView2(
-              index: 3,
-            ),
+            // buildTabView2(
+            //   index: 3,
+            // ),
             buildTabView1(
               index: 4,
               image: 'assets/images/profile_bottom.png',
@@ -69,7 +69,7 @@ class _BottomBarState extends State<BottomBar> {
         child: Image(
             height: isSelected ? 3.5.h : 3.h,
             image: AssetImage(image),
-            color: isSelected ? gPrimaryColor : gBlackColor,
+            color: isSelected ? gSecondaryColor : gBlackColor,
             fit: BoxFit.contain),
         onTap: () => widget.onChangedTab(index),
       ),
@@ -88,7 +88,7 @@ class _BottomBarState extends State<BottomBar> {
         child: Image(
             height: isSelected ? 2.5.h : 2.h,
             image: AssetImage(image),
-            color: isSelected ? gPrimaryColor : gBlackColor,
+            color: isSelected ? gSecondaryColor : gBlackColor,
             fit: BoxFit.contain),
         onTap: () => widget.onChangedTab(index),
       ),
@@ -106,7 +106,7 @@ class _BottomBarState extends State<BottomBar> {
           height: isSelected ? 3.7.h : 3.2.h,
           child: Icon(
             Icons.notifications_outlined,
-            color: isSelected ? gPrimaryColor : gBlackColor,
+            color: isSelected ? gSecondaryColor : gBlackColor,
           ),
         ),
         onTap: () => widget.onChangedTab(index),

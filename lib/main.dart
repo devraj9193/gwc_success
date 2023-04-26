@@ -6,8 +6,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:get/get.dart';
+import 'package:gwc_success_team/screens/dashboard/notification_screen.dart';
 import 'package:gwc_success_team/utils/constants.dart';
 import 'package:gwc_success_team/utils/gwc_api.dart';
 import 'package:gwc_success_team/utils/http_override.dart';
@@ -17,7 +19,8 @@ import 'package:sizer/sizer.dart';
 import 'model/quick_blox_repository/quick_blox_repository.dart';
 import 'model/quick_blox_service/quick_blox_service.dart';
 import 'screens/splash_screen.dart';
-import 'package:quickblox_sdk/quickblox_sdk.dart';
+import '../model/quick_blox_repository/quick_blox_repository.dart';
+import '../utils/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
@@ -120,7 +123,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final _pref = GwcApi.preferences;
 
   getDeviceId() async {
     final _pref = GwcApi.preferences;
@@ -145,7 +147,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     getDeviceId();
-  }
+      }
 
   @override
   Widget build(BuildContext context) {

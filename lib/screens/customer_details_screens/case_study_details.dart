@@ -50,7 +50,7 @@ class _CaseStudyDetailsState extends State<CaseStudyDetails> {
                               style: TextStyle(
                                 height: 1.5,
                                 fontSize: 12.sp,
-                                color: gPrimaryColor,
+                                color:newBlackColor,
                                 fontFamily: "GothamMedium",
                               ),
                             ),

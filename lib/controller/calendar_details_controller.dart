@@ -27,12 +27,13 @@ class CalendarDetailsController extends GetxController {
 
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var token = preferences.getString("token");
-
+    print(token);
     final response = await http.get(
         Uri.parse("${GwcApi.calendarUrl}?start=$startDate&end=$endDate"),
         headers: {
           'Authorization': 'Bearer $token',
-        });print("Calendar: ${response.body}");
+        });
+    print("Calendar: ${response.body}");
     if (response.statusCode == 200) {
       CalendarModel jsonData = calendarModelFromJson(response.body);
       List<Meeting>? arrData = jsonData.data;

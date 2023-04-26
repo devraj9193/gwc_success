@@ -1,13 +1,15 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gwc_success_team/screens/login_screen/success_login.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../model/quick_blox_repository/quick_blox_repository.dart';
-import '../utils/constants.dart';
+import '../model/quick_blox_service/quick_blox_service.dart';
+import '../utils/gwc_api.dart';
 import '../widgets/background_widget.dart';
 import 'bottom_bar/dashboard_screen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 import 'dashboard/notification_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -19,11 +21,12 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final PageController _pageController = PageController(initialPage: 0);
+  static final _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final SharedPreferences _pref = GwcApi.preferences!;
+  String deviceToken = "";
   int _currentPage = 0;
   Timer? _timer;
-  static final _notificationsPlugin = FlutterLocalNotificationsPlugin();
   String loginStatus = "";
-  String deviceToken = "";
 
   getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -35,33 +38,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     getPref();
-    requestPermission();
-    getToken();
-    initInfo();
     super.initState();
     startTimer();
-  }
-
-  startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
-      if (_currentPage < 1) {
-        _currentPage++;
-      } else {
-        _currentPage = 1;
-      }
-
-      _pageController.animateToPage(
-        _currentPage,
-        duration: const Duration(milliseconds: 350),
-        curve: Curves.easeIn,
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+    requestPermission();
+    //getToken();
+    initInfo();
   }
 
   initInfo() {
@@ -83,6 +64,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("---Firebase Message---");
+      print("MAP : ${message.toMap()}");
+      print(message.data["notification_type"]);
       print(
           "onMessage: ${message.notification?.title}/${message.notification?.body}");
       BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
@@ -104,28 +87,76 @@ class _SplashScreenState extends State<SplashScreen> {
         android: androidPlatformChannelSpecifics,
         iOS: const DarwinNotificationDetails(),
       );
-      await _notificationsPlugin.show(0, message.notification?.title,
-          message.notification?.body, platformChannelSpecifics,
-          payload: message.data['title']);
+      if (message.data["notification_type"] != "new_chat") {
+        await _notificationsPlugin.show(0, message.notification?.title,
+            message.notification?.body, platformChannelSpecifics,
+            payload: message.data['title']);
+      }
     });
+
+    FirebaseMessaging.onMessageOpenedApp.listen(
+      (message) async {
+        print("FirebaseMessaging.onMessageOpenedApp.listen");
+        if (message.notification != null) {
+          print(
+              "message.notification!.title : ${message.data["title"].toString()}");
+          print(message.notification!.body);
+          print(message.toMap());
+          print("message.data22 ${message.data['notification_type']}");
+          if (message.data != null) {
+            if (message.data['notification_type'] == 'new_chat') {
+              final accessToken = _pref.getString(GwcApi.kaleyraAccessToken);
+              final uId = _pref.getString("kaleyraUserId");
+
+              final qbService =
+                  Provider.of<QuickBloxService>(context, listen: false);
+              await qbService.openKaleyraChat(
+                  "$uId", message.data["title"].toString(), "$accessToken");
+            }
+          } else {
+            await Navigator.push(
+              context,
+              MaterialPageRoute<void>(
+                builder: (context) => const NotificationScreen(),
+              ),
+            );
+          }
+        }
+      },
+    );
   }
 
   void onDidReceiveNotificationResponse(
       NotificationResponse notificationResponse) async {
     final String? payload = notificationResponse.payload;
+    print("payload : ${notificationResponse.payload}");
+    print("NotificationResponse : $NotificationResponse");
     if (notificationResponse.payload != null) {
       debugPrint('notification payload: $payload');
+
+      await Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (context) => const NotificationScreen(),
+        ),
+      );
     }
-    await Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (context) => const NotificationScreen(),
-      ),
-    );
   }
 
   void requestPermission() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    await FirebaseMessaging.instance.getToken().then((value) {
+      setState(() {
+        deviceToken = value!;
+        print("Device Token is : $deviceToken");
+      });
+    });
+    _pref.setString("device_token", deviceToken);
+
+    // QuickBloxRepository().init(appId, authKey, authSecret, accountKey);
+    //
+    // QuickBloxRepository().initSubscription(deviceToken);
 
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
@@ -147,16 +178,39 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  void getToken() async {
-    await FirebaseMessaging.instance.getToken().then((value) {
-      setState(() {
-        deviceToken = value!;
-        print("Device Token is : $deviceToken");
-      });
-      QuickBloxRepository().init(appId, authKey, authSecret, accountKey);
+  // void getToken() async {
+  //   await FirebaseMessaging.instance.getToken().then((value) {
+  //     setState(() {
+  //       deviceToken = value!;
+  //       print("Device Token is : $deviceToken");
+  //     });
+  //     QuickBloxRepository().init(appId, authKey, authSecret, accountKey);
+  //
+  //     QuickBloxRepository().initSubscription(value!);
+  //   });
+  //   _pref?.setString("device_token", deviceToken);
+  // }
 
-      QuickBloxRepository().initSubscription(value!);
+  startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+      if (_currentPage < 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 1;
+      }
+
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeIn,
+      );
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override

@@ -30,9 +30,10 @@ class GwcApi {
 
   static String chatGroupIdUrl = "$baseUrl/api/getData/get_chat_team_group";
 
-  static String doctorChatGroupIdUrl = "$baseUrl/api/getData/get_doctor_success_chat_group";
+  static String doctorChatGroupIdUrl =
+      "$baseUrl/api/getData/get_doctor_success_chat_group";
 
- // static String doctorChatGroupIdUrl ="$baseUrl/api/getData/get_chat_messages_list/success_team_chat";
+  // static String doctorChatGroupIdUrl ="$baseUrl/api/getData/get_chat_messages_list/success_team_chat";
 
   static String customerChatListApiUrl =
       "$baseUrl/api/getData/get_chat_messages_group";
@@ -43,7 +44,6 @@ class GwcApi {
       "$baseUrl/api/getshippingData/shipping_customer_list";
 
   static String evaluationUrl =
-
       "$baseUrl/api/listData/customer_evaluation_form";
 
   static String customerMRReport = "$baseUrl/api/listData/customer_profile";
@@ -57,13 +57,23 @@ class GwcApi {
 
   static String consultationUrl = "$baseUrl/api/listData/consultation";
 
-  static String maintenanceGuideUrl =
-      "$baseUrl/api/listData/post_program_list";
+  static String maintenanceGuideUrl = "$baseUrl/api/listData/post_program_list";
 
   static String notificationListUrl = "$baseUrl/api/getData/notification_list";
 
   static String callApiUrl = "$baseUrl/api/getData/call_user";
 
+  static String preparatoryApiUrl =
+      "$baseUrl/api/getDataList/user_prep_meal_plan";
+
+  static String preparatoryAnswerApiUrl =
+      "$baseUrl/api/getDataList/tracking_prep_meal";
+
+  static String transitionApiUrl =
+      "$baseUrl/api/getDataList/user_trans_meal_plan";
+
+  static String transitionAnswerApiUrl =
+      "$baseUrl/api/getDataList/trans_meal_tracking_data";
 
   static const String groupId = '635fa22932eaaf0030c5ef1e';
   static const String doctorGroupId = '635fa22932eaaf0030c5ef1e';
@@ -71,6 +81,19 @@ class GwcApi {
   static const String getQBSession = 'qb_session';
   static const String isQBLogin = 'is_qb_login';
   static const String qbUsername = 'qb_username';
+
+  static const String apiKey = "ak_live_d2ad6702fe931fbeb2fa9cb4";
+  static const String appId =
+      "mAppId_a4908f3e2fa60c828daff5e875b0af422545696fa0bffa76d614489aae8d";
+  static const String kaleyraAccessToken = "kaleyra_access_token";
+
+  static String oopsMessage = "OOps ! Something went wrong.";
+
+  static String successMemberName = "successMemberName";
+  static String successMemberProfile = "successMemberProfile";
+  static String successMemberAddress = "successMemberAddress";
+
+
 
   static SharedPreferences? preferences;
   static Future<String?> getDeviceId() async {

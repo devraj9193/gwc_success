@@ -3,8 +3,11 @@ import 'package:sizer/sizer.dart';
 import '../../controller/meal_plan_controller.dart';
 import '../../model/meal_plan_model.dart';
 import '../../utils/constants.dart';
+import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
 import 'package:get/get.dart';
+
+import '../customer_details_screens/meal_pdf.dart';
 
 class DayPlanDetails extends StatefulWidget {
   const DayPlanDetails({Key? key}) : super(key: key);
@@ -26,16 +29,13 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: buildAppBar(() {
+          Navigator.pop(context);
+        }),
+        backgroundColor: whiteTextColor,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 1.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 3.w),
-              child: buildAppBar(() {
-                Navigator.pop(context);
-              }),
-            ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 3.w),
               child: Row(
@@ -43,10 +43,7 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
                 children: [
                   Text(
                     'Day $selectedDay Meal Plan',
-                    style: TextStyle(
-                        fontSize: 11.sp,
-                        fontFamily: "GothamMedium",
-                        color: gPrimaryColor),
+                    style: MealPlan().headingText(),
                   ),
                   DropdownButton(
                     value: selectedDay,
@@ -99,7 +96,7 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
             return Column(
               children: [
                 Container(
-                  margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 3.w),
+                  margin: EdgeInsets.symmetric(horizontal: 1.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
@@ -120,22 +117,13 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(8),
                               topRight: Radius.circular(8)),
-                          gradient: LinearGradient(colors: [
-                            Color(0xffE06666),
-                            Color(0xff93C47D),
-                            Color(0xffFFD966),
-                          ], begin: Alignment.topLeft, end: Alignment.topRight),
+                          color: gSecondaryColor,
                         ),
                       ),
                       DataTable(
-                        headingTextStyle: TextStyle(
-                          color: gWhiteColor,
-                          fontSize: 10.sp,
-                          fontFamily: "GothamMedium",
-                        ),
+                        headingTextStyle: MealPlan().subHeadingText(),
                         headingRowHeight: 5.h,
                         horizontalMargin: 2.w,
-                        // columnSpacing: 7.w,
                         dataRowHeight: getRowHeight(),
                         columns: const <DataColumn>[
                           DataColumn(label: Text('Time')),
@@ -224,46 +212,42 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
                     ],
                   ),
                 ),
-                Container(
-                  width: (data.comment == null) ? 0 : double.maxFinite,
-                  margin: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
-                  padding: EdgeInsets.symmetric(horizontal: 3.w, vertical: 1.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(2, 10),
+                (data.comment == "")
+                    ? const SizedBox()
+                    : Container(
+                        width: double.maxFinite,
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 1.w, vertical: 1.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 3.w, vertical: 1.h),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              blurRadius: 20,
+                              offset: const Offset(2, 10),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Comments : ",
+                              // 'Lorem ipsum is simply dummy text of the printing and typesetting industry.Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s,when an unknown printer took a gallery of type.',
+                              style: MealPlan().mealText(),
+                            ),
+                            SizedBox(height: 1.h),
+                            Text(
+                              data.comment ?? "",
+                              // 'Lorem ipsum is simply dummy text of the printing and typesetting industry.Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s,when an unknown printer took a gallery of type.',
+                              style: MealPlan().subHeadingText(),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      (data.comment == null) ?  Container() : Text(
-                        "Comments : ",
-                        // 'Lorem ipsum is simply dummy text of the printing and typesetting industry.Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s,when an unknown printer took a gallery of type.',
-                        style: TextStyle(
-                            fontSize: 10.sp,
-                            height: 1.3,
-                            fontFamily: "GothamBook",
-                            color: gPrimaryColor),
-                      ) ,
-                      (data.comment == null) ? Container(): SizedBox(height: 1.h),
-                      Text(
-                        data.comment ?? "",
-                        // 'Lorem ipsum is simply dummy text of the printing and typesetting industry.Lorem ipsum has been the industry\'s standard dummy text ever since the 1500s,when an unknown printer took a gallery of type.',
-                        style: TextStyle(
-                            fontSize: 10.sp,
-                            height: 1.3,
-                            fontFamily: "GothamBook",
-                            color: gTextColor),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             );
           }
@@ -283,12 +267,7 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
             DataCell(
               Text(
                 dayTime,
-                style: TextStyle(
-                  height: 1.5,
-                  color: gTextColor,
-                  fontSize: 8.sp,
-                  fontFamily: "GothamBold",
-                ),
+                style: MealPlan().timeText(),
               ),
             ),
             DataCell(
@@ -299,35 +278,15 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
                 children: [
                   ...value
                       .map((e) => GestureDetector(
-                            //  onTap: e.url == null ? null : e.type == 'item' ? () => MealPdf(pdfLink: e.url!,) : () => showVideo(e),
-                            child: Row(
-                              children: [
-                                e.type == 'yoga'
-                                    ? GestureDetector(
-                                        onTap: () {},
-                                        child: Image(
-                                          image: const AssetImage(
-                                              "assets/images/noun-play-1832840.png"),
-                                          height: 2.h,
-                                        ),
-                                      )
-                                    : const SizedBox(),
-                                if (e.type == 'yoga') SizedBox(width: 2.w),
-                                Expanded(
-                                  child: Text(
-                                    " ${e.name.toString()}",
-                                    maxLines: 3,
-                                    textAlign: TextAlign.start,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      height: 1.5,
-                                      color: gTextColor,
-                                      fontSize: 8.sp,
-                                      fontFamily: "GothamBook",
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            onTap: () => MealPdf(pdfLink: e.url!, heading: '',),
+                            child: Expanded(
+                              child: Text(
+                                " ${e.name.toString()}",
+                                maxLines: 3,
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                                style: MealPlan().mealText(),
+                              ),
                             ),
                           ))
                       .toList()
@@ -357,15 +316,15 @@ class _DayPlanDetailsState extends State<DayPlanDetails> {
                           color: gWhiteColor,
                           borderRadius: BorderRadius.circular(5),
                           border: Border.all(
-                              color: gMainColor.withOpacity(0.3), width: 1),
+                              color: lightTextColor, width: 1),
                         ),
                         child: Text(
                           e.status.toString(),
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              fontFamily: "GothamBook",
+                              fontFamily: fontBook,
                               color: buildTextColor(e.status.toString()),
-                              fontSize: 8.sp),
+                              fontSize: fontSize08),
                         ),
                       ),
                     );

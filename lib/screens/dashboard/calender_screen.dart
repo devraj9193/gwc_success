@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gwc_success_team/screens/dashboard/transition_meal_plan.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -9,10 +11,13 @@ import '../../model/calendar_model.dart';
 import '../../model/customers_list_model.dart';
 import '../../utils/constants.dart';
 import '../../utils/gwc_api.dart';
+import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
+import '../common_ui/call_chat_icons.dart';
 import '../common_ui/show_profile.dart';
-import '../post_programs_screens/post_programs_screen.dart';
-import '../shipping_screens/shipping_pending_screen.dart';
+import 'meal_plan_screen.dart';
+import 'post_programs_screen.dart';
+import 'shipping_pending_screen.dart';
 import 'active_consultation_screen.dart';
 import 'notification_screen.dart';
 import 'consultation_pending_screen.dart';
@@ -27,11 +32,31 @@ class CalenderScreen extends StatefulWidget {
 class _CalenderScreenState extends State<CalenderScreen> {
   final searchController = TextEditingController();
   CustomersList? customersList;
-  List searchResults = [];
+  List<Datum> searchResults = [];
+  final SharedPreferences _pref = GwcApi.preferences!;
+
+  String? _subjectText = '',
+      _startTimeText = '',
+      _endTimeText = '',
+      _dateText = '',
+      _timeDetails = '';
+  // Color? _headerColor, _viewHeaderColor, _calendarColor;
+
+  String kaleyraAccessToken = "";
+  String kaleyraUserId = "";
+
+  void getKaleyraDetails() async {
+    kaleyraAccessToken = _pref.getString(GwcApi.kaleyraAccessToken)!;
+    kaleyraUserId = _pref.getString("kaleyraUserId")!;
+    setState(() {});
+    print("kaleyraAccessToken: $kaleyraAccessToken");
+  }
 
   @override
   void initState() {
     super.initState();
+    fetchCustomersList();
+    getKaleyraDetails();
     searchController.addListener(() {
       setState(() {});
     });
@@ -41,6 +66,22 @@ class _CalenderScreenState extends State<CalenderScreen> {
   void dispose() {
     super.dispose();
     searchController.dispose();
+  }
+
+  Future<List<Datum>?> fetchCustomersList() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var token = preferences.getString("token")!;
+    final response =
+        await http.get(Uri.parse(GwcApi.customersListApiUrl), headers: {
+      'Authorization': 'Bearer $token',
+    });
+    if (response.statusCode == 200) {
+      customersList = customersListFromJson(response.body);
+      List<Datum>? arrData = customersList?.data;
+      return arrData;
+    } else {
+      throw Exception();
+    }
   }
 
   List doctorDetails = [
@@ -55,9 +96,19 @@ class _CalenderScreenState extends State<CalenderScreen> {
       "id": "2",
     },
     {
+      "title": "Meal Plan",
+      "image": "assets/images/Group 3011.png",
+      "id": "5",
+    },
+    {
       "title": "Active",
       "image": "assets/images/Group 3011.png",
       "id": "3",
+    },
+    {
+      "title": "Transition",
+      "image": "assets/images/Group 3011.png",
+      "id": "6",
     },
     {
       "title": "Post Program",
@@ -69,58 +120,52 @@ class _CalenderScreenState extends State<CalenderScreen> {
   CalendarDetailsController calendarDetailsController =
       Get.put(CalendarDetailsController());
 
-  Future<List<Datum>?> fetchCustomersList() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    var token = preferences.getString("token")!;
-
-    final response =
-        await http.get(Uri.parse(GwcApi.customersListApiUrl), headers: {
-      'Authorization': 'Bearer $token',
-    });
-    if (response.statusCode == 200) {
-      print("status: ${response.body}");
-      CustomersList jsonData = customersListFromJson(response.body);
-      List<Datum>? arrData = jsonData.data;
-      return arrData;
-    } else {
-      throw Exception();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: chartBackGroundColor,
+          automaticallyImplyLeading: false,
+          centerTitle: false,
+          elevation: 0,
+          title: Image(
+            image: const AssetImage("assets/images/Gut wellness logo.png"),
+            height: 5.h,
+          ),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 3.w),
+              child: InkWell(
+                child: const Icon(
+                  Icons.notifications_none_sharp,
+                  color: gBlackColor,
+                ),
+                onTap: () {
+                  Get.to(() => const NotificationScreen());
+                },
+              ),
+            )
+            // GestureDetector(
+            //   onTap: () {
+            //     buildCalendar(context);
+            //   },
+            //   child: Padding(
+            //     padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.8.h),
+            //     child: const Image(
+            //       image: AssetImage("assets/images/noun-calendar-5347015.png"),
+            //       color: gBlackColor,
+            //     ),
+            //   ),
+            // ),
+          ],
+        ),
+        backgroundColor: chartBackGroundColor,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  height: 8.h,
-                  child: const Image(
-                    image:
-                        AssetImage("assets/images/Gut wellness logo green.png"),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ct) => const NotificationScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(
-                    Icons.notifications_outlined,
-                    color: gMainColor,
-                  ),
-                ),
-              ],
-            ),
-            buildSearchWidget(),
             SizedBox(height: 1.h),
+            buildSearchWidget(),
             searchController.text.isEmpty
                 ? Expanded(child: buildCalender())
                 : Expanded(child: buildSearchList()),
@@ -133,51 +178,48 @@ class _CalenderScreenState extends State<CalenderScreen> {
     );
   }
 
-   buildSearchWidget() {
+  buildSearchWidget() {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(6),
         color: Colors.white,
-        border: Border.all(color: gMainColor.withOpacity(0.5), width: 1.0),
+        border: Border.all(color: lightTextColor.withOpacity(0.3), width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            color: lightTextColor.withOpacity(0.3),
             blurRadius: 2,
           ),
         ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 2.w),
-      margin: EdgeInsets.symmetric(horizontal: 5.w),
+      //padding: EdgeInsets.symmetric(horizontal: 2.w),
+      margin: EdgeInsets.symmetric(horizontal: 3.w),
       child: TextFormField(
         textAlignVertical: TextAlignVertical.center,
         controller: searchController,
+        cursorColor: newBlackColor,
+        cursorHeight: 2.h,
         textAlign: TextAlign.left,
         decoration: InputDecoration(
           prefixIcon: Icon(
             Icons.search,
-            color: gMainColor,
+            color: newBlackColor,
             size: 2.5.h,
           ),
           hintText: "Search...",
           suffixIcon: searchController.text.isNotEmpty
               ? GestureDetector(
-                  child:
-                      Icon(Icons.close_outlined, size: 2.h, color: gMainColor),
+                  child: Icon(Icons.close_outlined,
+                      size: 2.h, color: newBlackColor),
                   onTap: () {
                     searchController.clear();
                     FocusScope.of(context).requestFocus(FocusNode());
                   },
                 )
               : null,
-          hintStyle: TextStyle(
-            fontFamily: "GothamBook",
-            color: gMainColor,
-            fontSize: 9.sp,
-          ),
+          hintStyle: LoginScreen().hintTextField(),
           border: InputBorder.none,
         ),
-        style: TextStyle(
-            fontFamily: "GothamBook", color: gMainColor, fontSize: 11.sp),
+        style: LoginScreen().mainTextField(),
         onChanged: (value) {
           onSearchTextChanged(value);
         },
@@ -188,7 +230,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
   buildSearchList() {
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 2.w),
+        padding: EdgeInsets.symmetric(vertical: 2.h, horizontal: 2.w),
+        margin: EdgeInsets.symmetric(vertical: 1.h, horizontal: 3.w),
         decoration: BoxDecoration(
           color: gWhiteColor,
           borderRadius: BorderRadius.circular(10),
@@ -201,11 +244,6 @@ class _CalenderScreenState extends State<CalenderScreen> {
         ),
         child: Column(
           children: [
-            Container(
-              height: 1,
-              color: Colors.grey.withOpacity(0.3),
-            ),
-            SizedBox(height: 2.h),
             ListView.builder(
               scrollDirection: Axis.vertical,
               padding: EdgeInsets.symmetric(horizontal: 1.w),
@@ -213,24 +251,75 @@ class _CalenderScreenState extends State<CalenderScreen> {
               shrinkWrap: true,
               itemCount: searchResults.length,
               itemBuilder: ((context, index) {
-                print("len: ${searchResults.length}");
                 return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
                       onTap: () {
-                        saveUserId(searchResults[index].id.toString());
+                        saveUserId(searchResults[index].id.toString(), "", "");
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const ShowProfile(),
                           ),
                         );
                       },
-                      child: Text(
-                        "${searchResults[index].fname ?? ""} ${searchResults[index].lname ?? ""}",
-                        style: TextStyle(
-                            fontFamily: "GothamMedium",
-                            color: gBlackColor,
-                            fontSize: 10.sp),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 2.h,
+                            backgroundImage: NetworkImage(
+                              searchResults[index].profile.toString(),
+                            ),
+                          ),
+                          SizedBox(width: 2.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${searchResults[index].fname ?? ""} ${searchResults[index].lname ?? ""}",
+                                  style: AllListText().headingText(),
+                                ),
+                                SizedBox(height: 1.h),
+                                Text(
+                                  "${searchResults[index].date}/${searchResults[index].time}",
+                                  style: AllListText().otherText(),
+                                ),
+                              ],
+                            ),
+                          ),
+                          CallChatIcons(
+                            userId: searchResults[index].id.toString(),
+                            kaleyraUserId:
+                                searchResults[index].kaleyraUserId.toString(),
+                          ),
+                          // trailIcons(callOnTap: () {
+                          //   dialog(context);
+                          //   saveUserId(
+                          //     "",
+                          //     "",
+                          //     searchResults[index].id.toString(),
+                          //   );
+                          // }, chatOnTap: () {
+                          //   saveUserId(
+                          //       "", "", searchResults[index].id.toString());
+                          //   setState(() {
+                          //     final qbService = Provider.of<QuickBloxService>(
+                          //         context,
+                          //         listen: false);
+                          //     qbService.openKaleyraChat(
+                          //         kaleyraUserId,
+                          //         searchResults[index].kaleyraUserId.toString(),
+                          //         kaleyraAccessToken);
+                          //     // getChatGroupId(
+                          //     //   "${searchResults[index].fname ?? ""} ${searchResults[index].lname ?? ""}",
+                          //     //   searchResults[index].profile.toString(),
+                          //     //   searchResults[index].id.toString(),
+                          //     // );
+                          //   });
+                          // }),
+                        ],
                       ),
                     ),
                     Container(
@@ -254,7 +343,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
       setState(() {});
       return;
     }
-    customersList?.data?.forEach((userDetail) {
+    customersList?.data.forEach((userDetail) {
       if (userDetail.fname!.toLowerCase().contains(text.trim().toLowerCase())) {
         searchResults.add(userDetail);
       }
@@ -262,63 +351,146 @@ class _CalenderScreenState extends State<CalenderScreen> {
     setState(() {});
   }
 
-  saveUserId(String userId) async {
+  saveUserId(String patientId, String teamPatientId, String userId) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString("patient_id", patientId);
+    preferences.setString("team_patient_id", teamPatientId);
     preferences.setString("user_id", userId);
   }
 
+  // final MessageRepository chatRepository = MessageRepository(
+  //   apiClient: ApiClient(
+  //     httpClient: http.Client(),
+  //   ),
+  // );
+  //
+  // getChatGroupId(String userName, String profileImage, String userId) async {
+  //   print(_pref.getInt(GwcApi.getQBSession));
+  //   print(_pref.getBool(GwcApi.isQBLogin));
+  //
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
+  //   var chatUserName = preferences.getString("chatUserName")!;
+  //   print("UserName: $chatUserName");
+  //
+  //   print(_pref.getInt(GwcApi.getQBSession) == null ||
+  //       _pref.getBool(GwcApi.isQBLogin) == null ||
+  //       _pref.getBool(GwcApi.isQBLogin) == false);
+  //   final _qbService = Provider.of<QuickBloxService>(context, listen: false);
+  //   print(await _qbService.getSession());
+  //   if (_pref.getInt(GwcApi.getQBSession) == null ||
+  //       await _qbService.getSession() == true ||
+  //       _pref.getBool(GwcApi.isQBLogin) == null ||
+  //       _pref.getBool(GwcApi.isQBLogin) == false) {
+  //     _qbService.login(chatUserName);
+  //   } else {
+  //     if (await _qbService.isConnected() == false) {
+  //       _qbService.connect(_pref.getInt(GwcApi.qbCurrentUserId)!);
+  //     }
+  //   }
+  //   final res = await ChatService(repository: chatRepository)
+  //       .getChatGroupIdService(userId);
+  //
+  //   if (res.runtimeType == GetChatGroupIdModel) {
+  //     GetChatGroupIdModel model = res as GetChatGroupIdModel;
+  //     // QuickBloxRepository().init(AppConfig.QB_APP_ID, AppConfig.QB_AUTH_KEY, AppConfig.QB_AUTH_SECRET, AppConfig.QB_ACCOUNT_KEY);
+  //     _pref.setString(GwcApi.groupId, model.group ?? '');
+  //     print("getModel:$res");
+  //     print('model.group: ${model.group}');
+  //     Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //             builder: (c) => MessageScreen(
+  //                   isGroupId: true,
+  //                   userName: userName,
+  //                   profileImage: profileImage,
+  //                 )));
+  //   } else {
+  //     ErrorModel model = res as ErrorModel;
+  //     showSnackbar(context, model.message.toString(), isError: true);
+  //   }
+  // }
+
+  // onSearchTextChanged(String text) async {
+  //   searchResults.clear();
+  //   if (text.isEmpty) {
+  //     setState(() {});
+  //     return;
+  //   }
+  //   customersList?.data?.forEach((userDetail) {
+  //     if (userDetail.fname!.toLowerCase().contains(text.trim().toLowerCase())) {
+  //       searchResults.add(userDetail);
+  //     }
+  //   });
+  //   setState(() {});
+  // }
+
   buildCalender() {
-    return FutureBuilder(
-        future: calendarDetailsController.fetchCalendarList(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error.toString()),
+    return Container(
+      height: double.maxFinite,
+      width: double.maxFinite,
+      margin: EdgeInsets.symmetric(horizontal: 2.w, vertical: 2.h),
+      padding: EdgeInsets.symmetric(horizontal: 2.w, vertical: 1.h),
+      decoration: BoxDecoration(
+        color: gWhiteColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: FutureBuilder(
+          future: calendarDetailsController.fetchCalendarList(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text(""),
+                //Text(snapshot.error.toString()),
+              );
+            } else if (snapshot.hasData) {
+              var data = snapshot.data;
+              return SfCalendar(
+                view: CalendarView.week,
+                showDatePickerButton: true,
+                cellBorderColor: chartBackGroundColor,
+                headerHeight: 30,
+                onTap: calendarTapped,
+                //   headerDateFormat: "yMMMMEEEEd",
+                timeSlotViewSettings: const TimeSlotViewSettings(
+                  startHour: 8,
+                  endHour: 22,
+                  nonWorkingDays: <int>[DateTime.friday, DateTime.monday],
+                ),
+                showWeekNumber: true,
+                showNavigationArrow: true,
+                showCurrentTimeIndicator: true,
+                allowViewNavigation: true,
+                allowDragAndDrop: false,
+                dataSource: MeetingDataSource(_getDataSource(data)),
+                headerStyle: CalendarHeaderStyle(
+                  textAlign: TextAlign.center,
+                  textStyle: TextStyle(
+                    fontFamily: fontMedium,
+                    color: newBlackColor,
+                    fontSize: fontSize10,
+                  ),
+                ),
+                viewHeaderStyle: ViewHeaderStyle(
+                  dayTextStyle: TextStyle(
+                    fontFamily: fontBold,
+                    color: newBlackColor,
+                    fontSize: fontSize09,
+                  ),
+                  dateTextStyle: TextStyle(
+                    fontFamily: fontBook,
+                    color: newBlackColor,
+                    fontSize: fontSize09,
+                  ),
+                ),
+                todayHighlightColor: gSecondaryColor,
+              );
+            }
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 20.h),
+              child: buildCircularIndicator(),
             );
-          } else if (snapshot.hasData) {
-            var data = snapshot.data;
-            return SfCalendar(
-              view: CalendarView.week,
-              showDatePickerButton: true,
-              timeSlotViewSettings: const TimeSlotViewSettings(
-                startHour: 8,
-                endHour: 22,
-                nonWorkingDays: <int>[DateTime.friday, DateTime.monday],
-              ),
-              showWeekNumber: false,
-              showNavigationArrow: true,
-              showCurrentTimeIndicator: true,
-              allowViewNavigation: true,
-              allowDragAndDrop: false,
-              dataSource: MeetingDataSource(_getDataSource(data)),
-              headerStyle: CalendarHeaderStyle(
-                textAlign: TextAlign.center,
-                textStyle: TextStyle(
-                  fontFamily: "GothamMedium",
-                  color: gTextColor,
-                  fontSize: 10.sp,
-                ),
-              ),
-              viewHeaderStyle: ViewHeaderStyle(
-                dayTextStyle: TextStyle(
-                  fontFamily: "GothamBold",
-                  color: gTextColor,
-                  fontSize: 9.sp,
-                ),
-                dateTextStyle: TextStyle(
-                  fontFamily: "GothamBook",
-                  color: gTextColor,
-                  fontSize: 9.sp,
-                ),
-              ),
-              todayHighlightColor: gSecondaryColor,
-            );
-          }
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.h),
-            child: buildCircularIndicator(),
-          );
-        });
+          }),
+    );
   }
 
   List<Meeting> _getDataSource(List<Meeting> data) {
@@ -330,6 +502,87 @@ class _CalenderScreenState extends State<CalenderScreen> {
     return data;
   }
 
+  void calendarTapped(CalendarTapDetails details) {
+    if (details.targetElement == CalendarElement.appointment ||
+        details.targetElement == CalendarElement.agenda) {
+      final Meeting appointmentDetails = details.appointments![0];
+      _subjectText = appointmentDetails.title;
+      _dateText = DateFormat('MMMM dd, yyyy')
+          .format(appointmentDetails.start)
+          .toString();
+      _startTimeText =
+          DateFormat('hh:mm a').format(appointmentDetails.start).toString();
+      _endTimeText =
+          DateFormat('hh:mm a').format(appointmentDetails.end).toString();
+      if (appointmentDetails.allDay) {
+        _timeDetails = 'All day';
+      } else {
+        _timeDetails = '$_startTimeText - $_endTimeText';
+      }
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                '$_subjectText',
+                style: TextStyle(
+                  fontFamily: fontBold,
+                  color: newBlackColor,
+                  fontSize: fontSize13,
+                ),
+              ),
+              content: Container(
+                height: 80,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: gWhiteColor),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      '$_dateText',
+                      style: TextStyle(
+                        fontFamily: fontMedium,
+                        color: newBlackColor,
+                        fontSize: fontSize12,
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Text(
+                      _timeDetails!,
+                      style: TextStyle(
+                        fontFamily: fontBook,
+                        color: newBlackColor,
+                        fontSize: fontSize11,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 1.h, horizontal: 3.w),
+                    decoration: BoxDecoration(
+                      color: gSecondaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'close',
+                      style: LoginScreen().buttonText(whiteTextColor),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          });
+    }
+  }
+
   buildDetails() {
     return GridView.builder(
         padding: EdgeInsets.symmetric(horizontal: 3.w),
@@ -339,7 +592,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 5,
-          mainAxisSpacing: 10,
+          mainAxisSpacing: 5,
           mainAxisExtent: 6.h,
         ),
         itemCount: doctorDetails.length,
@@ -370,13 +623,26 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     builder: (ct) => const PostProgramsScreen(),
                   ),
                 );
+              } else if (doctorDetails[index]["id"] == "5") {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ct) => const MealPlanScreen(),
+                  ),
+                );
+              } else if (doctorDetails[index]["id"] == "6") {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ct) => const TransitionMealPlanList(),
+                  ),
+                );
               }
             },
             child: Container(
+                padding: EdgeInsets.symmetric(vertical: 1.h),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: gPrimaryColor,
-                  border: Border.all(color: gMainColor, width: 1),
+                  color: gSecondaryColor,
+                  //border: Border.all(color: gMainColor, width: 1),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.3),
@@ -391,16 +657,12 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     Image(
                       height: 3.h,
                       image: AssetImage(doctorDetails[index]["image"]),
-                      color: gMainColor,
+                      color: whiteTextColor,
                     ),
                     SizedBox(width: 2.w),
                     Text(
                       doctorDetails[index]["title"],
-                      style: TextStyle(
-                        fontFamily: "GothamMedium",
-                        color: gMainColor,
-                        fontSize: 10.sp,
-                      ),
+                      style: DashBoardScreen().gridTextField(),
                     ),
                   ],
                 )),

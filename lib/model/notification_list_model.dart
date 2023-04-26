@@ -71,7 +71,7 @@ class NotificationModel {
     message: json["message"],
     requestId: json["request_id"],
     notificationType: json["notification_type"],
-    isRead: json["is_read"],
+    isRead: json["is_read"].toString(),
     addedBy: json["added_by"],
     createdAt: json["created_at"],
     updatedAt: json["updated_at"],

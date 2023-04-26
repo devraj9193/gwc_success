@@ -70,11 +70,12 @@ class _PopUpMenuWidgetState extends State<PopUpMenuWidget> {
                         "Call",
                         style: TextStyle(
                             fontFamily: "GothamBook",
-                            color: gSecondaryColor,
+                            color: gTextColor,
                             fontSize: 9.sp),
                       ),
                       Image(
                         image: const AssetImage("assets/images/Group 4890.png"),
+                        color: gTextColor,
                         height: 2.h,
                       ),
                     ],

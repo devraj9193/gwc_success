@@ -45,12 +45,21 @@ class GetCustomerModel {
         username: json["username"],
         age: json["age"],
         profile: json["profile"],
-        consultationDateAndTime: ConsultationDateAndTime.fromJson(
-            json["consultation_date_and_time"]),
-        programName: MealAndYogaPlan.fromJson(json["program_name"]),
-        mealAndYogaPlan: MealAndYogaPlan.fromJson(json["meal_and_yoga_plan"]),
-        mrReport: CaseSheet.fromJson(json["mr_report"]),
-        caseSheet: CaseSheet.fromJson(json["case_sheet"]),
+        consultationDateAndTime: json["consultation_date_and_time"] != null
+            ? ConsultationDateAndTime.fromJson(json["consultation_date_and_time"])
+            : null,
+        programName: json["program_name"] != null
+            ? MealAndYogaPlan.fromJson(json["program_name"])
+            : null,
+        mealAndYogaPlan: json["meal_and_yoga_plan"] != null
+            ? MealAndYogaPlan.fromJson(json["meal_and_yoga_plan"])
+            : null,
+        mrReport: json["mr_report"] != null
+            ? CaseSheet.fromJson(json["mr_report"])
+            : null,
+        caseSheet: json["case_sheet"] != null
+            ? CaseSheet.fromJson(json["case_sheet"])
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -125,10 +134,8 @@ class ConsultationDateAndTime {
     this.slotEndTime,
     this.type,
     this.status,
-    this.zoomJoinUrl,
-    this.zoomStartUrl,
-    this.zoomId,
-    this.zoomPassword,
+    this.kaleyraUserUrl,
+    this.userSuccessChatRoom,
     this.createdAt,
     this.updatedAt,
     this.appointmentDate,
@@ -142,10 +149,8 @@ class ConsultationDateAndTime {
   String? slotEndTime;
   String? type;
   String? status;
-  String? zoomJoinUrl;
-  String? zoomStartUrl;
-  String? zoomId;
-  String? zoomPassword;
+  String? kaleyraUserUrl;
+  String? userSuccessChatRoom;
   String? createdAt;
   String? updatedAt;
   String? appointmentDate;
@@ -160,10 +165,8 @@ class ConsultationDateAndTime {
         slotEndTime: json["slot_end_time"],
         type: json["type"],
         status: json["status"],
-        zoomJoinUrl: json["zoom_join_url"],
-        zoomStartUrl: json["zoom_start_url"],
-        zoomId: json["zoom_id"],
-        zoomPassword: json["zoom_password"],
+        kaleyraUserUrl: json["kaleyra_user_url"],
+        userSuccessChatRoom: json["user_success_chat_room"],
         createdAt: json["created_at"],
         updatedAt: json["updated_at"],
         appointmentDate: json["appointment_date"],
@@ -178,10 +181,8 @@ class ConsultationDateAndTime {
         "slot_end_time": slotEndTime,
         "type": type,
         "status": status,
-        "zoom_join_url": zoomJoinUrl,
-        "zoom_start_url": zoomStartUrl,
-        "zoom_id": zoomId,
-        "zoom_password": zoomPassword,
+        "kaleyra_user_url": kaleyraUserUrl,
+        "user_success_chat_room": userSuccessChatRoom,
         "created_at": createdAt,
         "updated_at": updatedAt,
         "appointment_date": appointmentDate,

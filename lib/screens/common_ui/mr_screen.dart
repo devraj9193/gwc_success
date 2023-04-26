@@ -3,6 +3,7 @@ import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import '../../utils/constants.dart';
+import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
 
 class MRScreen extends StatefulWidget {
@@ -18,23 +19,24 @@ class _MRScreenState extends State<MRScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: buildAppBar(() {
+          Navigator.pop(context);
+        }),
+        backgroundColor: whiteTextColor,
+
         body: Padding(
-          padding: EdgeInsets.symmetric(vertical: 1.h, horizontal: 5.w),
+          padding: EdgeInsets.symmetric(vertical: 0.h, horizontal: 5.w),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              buildAppBar(() {
-                Navigator.pop(context);
-              }),
+
               // SizedBox(height: 1.h),
               Text(
                 "MR Report",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontFamily: 'GothamBold',
-                    color: gPrimaryColor,
-                    fontSize: 11.sp),
+                style: MealPlan().headingText(),
+
               ),
               SizedBox(height: 1.h),
               Expanded(

@@ -18,7 +18,13 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+
       child: Scaffold(
+        appBar: buildAppBar(() {
+          Navigator.pop(context);
+        }),
+        backgroundColor: whiteTextColor,
+
         body: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
@@ -27,9 +33,7 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                buildAppBar(() {
-                  Navigator.pop(context);
-                }),
+
                 SizedBox(height: 1.h),
                 Text(
                   "Terms and Conditions",

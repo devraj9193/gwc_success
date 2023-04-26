@@ -57,6 +57,7 @@ class DoctorsTeam {
     this.deviceType,
     this.deviceId,
     this.age,
+    this.kaleyraUserId,
     this.pincode,
     this.isActive,
     this.addedBy,
@@ -82,6 +83,7 @@ class DoctorsTeam {
   String? deviceType;
   String? deviceId;
   String? age;
+  String? kaleyraUserId;
   String? pincode;
   String? isActive;
   String? addedBy;
@@ -107,6 +109,7 @@ class DoctorsTeam {
         deviceType: json["device_type"],
         deviceId: json["device_id"],
         age: json["age"],
+        kaleyraUserId: json["kaleyra_user_id"],
         pincode: json["pincode"],
         isActive: json["is_active"],
         addedBy: json["added_by"],
@@ -133,6 +136,7 @@ class DoctorsTeam {
         "device_type": deviceType,
         "device_id": deviceId,
         "age": age,
+        "kaleyra_user_id": kaleyraUserId,
         "pincode": pincode,
         "is_active": isActive,
         "added_by": addedBy,

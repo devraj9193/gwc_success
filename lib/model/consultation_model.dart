@@ -38,8 +38,8 @@ class ConsultationModel {
         pendingConsultation: json["pending_consultation"].toString(),
         completedConsultation: json["completed_consultation"].toString(),
         mrPendingConsultation: json["mr_pending_consultation"].toString(),
-        documentUpload: List<DocumentUpload>.from(json["document_upload"].map((x) => DocumentUpload.fromJson(x))),
-
+        documentUpload: List<DocumentUpload>.from(
+            json["document_upload"].map((x) => DocumentUpload.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,7 +50,8 @@ class ConsultationModel {
         "pending_consultation": pendingConsultation,
         "completed_consultation": completedConsultation,
         "mr_pending_consultation": mrPendingConsultation,
-    "document_upload": List<dynamic>.from(documentUpload!.map((x) => x.toJson())),
+        "document_upload":
+            List<dynamic>.from(documentUpload!.map((x) => x.toJson())),
       };
 }
 
@@ -74,6 +75,7 @@ class TeamPatients {
     this.labelUrl,
     this.patient,
     this.appointments,
+    this.team,
   });
 
   int? id;
@@ -93,6 +95,7 @@ class TeamPatients {
   String? manifestUrl;
   String? labelUrl;
   Patient? patient;
+  Team? team;
   List<dynamic>? appointments;
 
   factory TeamPatients.fromJson(Map<String, dynamic> json) => TeamPatients(
@@ -113,6 +116,7 @@ class TeamPatients {
         manifestUrl: json["manifest_url"],
         labelUrl: json["label_url"],
         patient: Patient.fromJson(json["patient"]),
+        team: Team.fromJson(json["team"]),
         appointments: List<dynamic>.from(json["appointments"].map((x) => x)),
       );
 
@@ -134,6 +138,7 @@ class TeamPatients {
         "manifest_url": manifestUrl,
         "label_url": labelUrl,
         "patient": patient?.toJson(),
+        "team": team?.toJson(),
         "appointments":
             List<dynamic>.from(appointments!.map((x) => x.toJson())),
       };
@@ -257,46 +262,47 @@ class DocumentUpload {
   Patient? patient;
 
   factory DocumentUpload.fromJson(Map<String, dynamic> json) => DocumentUpload(
-    id: json["id"],
-    teamId: json["team_id"],
-    patientId: json["patient_id"],
-    programId: json["program_id"],
-    assignedDate: json["assigned_date"],
-    uploadTime: json["upload_time"],
-    status: json["status"],
-    isArchieved: json["is_archieved"],
-    createdAt: json["created_at"],
-    updatedAt: json["updated_at"],
-    appointmentDate: json["appointment_date"],
-    appointmentTime: json["appointment_time"],
-    updateDate: json["update_date"],
-    updateTime: json["update_time"],
-    manifestUrl: json["manifest_url"],
-    labelUrl: json["label_url"],
-    appointments: List<dynamic>.from(json["appointments"].map((x) => x)),
-    patient: Patient.fromJson(json["patient"]),
-  );
+        id: json["id"],
+        teamId: json["team_id"],
+        patientId: json["patient_id"],
+        programId: json["program_id"],
+        assignedDate: json["assigned_date"],
+        uploadTime: json["upload_time"],
+        status: json["status"],
+        isArchieved: json["is_archieved"],
+        createdAt: json["created_at"],
+        updatedAt: json["updated_at"],
+        appointmentDate: json["appointment_date"],
+        appointmentTime: json["appointment_time"],
+        updateDate: json["update_date"],
+        updateTime: json["update_time"],
+        manifestUrl: json["manifest_url"],
+        labelUrl: json["label_url"],
+        appointments: List<dynamic>.from(json["appointments"].map((x) => x)),
+        patient: Patient.fromJson(json["patient"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "team_id": teamId,
-    "patient_id": patientId,
-    "program_id": programId,
-    "assigned_date": assignedDate,
-    "upload_time": uploadTime,
-    "status": status,
-    "is_archieved": isArchieved,
-    "created_at": createdAt,
-    "updated_at": updatedAt,
-    "appointment_date": appointmentDate,
-    "appointment_time": appointmentTime,
-    "update_date": updateDate,
-    "update_time": updateTime,
-    "manifest_url": manifestUrl,
-    "label_url": labelUrl,
-    "appointments": List<dynamic>.from(appointments!.map((x) => x.toJson())),
-    "patient": patient?.toJson(),
-  };
+        "id": id,
+        "team_id": teamId,
+        "patient_id": patientId,
+        "program_id": programId,
+        "assigned_date": assignedDate,
+        "upload_time": uploadTime,
+        "status": status,
+        "is_archieved": isArchieved,
+        "created_at": createdAt,
+        "updated_at": updatedAt,
+        "appointment_date": appointmentDate,
+        "appointment_time": appointmentTime,
+        "update_date": updateDate,
+        "update_time": updateTime,
+        "manifest_url": manifestUrl,
+        "label_url": labelUrl,
+        "appointments":
+            List<dynamic>.from(appointments!.map((x) => x.toJson())),
+        "patient": patient?.toJson(),
+      };
 }
 
 class Patient {
@@ -363,6 +369,87 @@ class Patient {
       };
 }
 
+class Team {
+  Team({
+    this.id,
+    this.teamName,
+    this.shiftId,
+    this.slotsPerDay,
+    this.isArchieved,
+    this.createdAt,
+    this.updatedAt,
+    this.teamMember,
+  });
+
+  int? id;
+  String? teamName;
+  String? shiftId;
+  String? slotsPerDay;
+  String? isArchieved;
+  String? createdAt;
+  String? updatedAt;
+  List<TeamMember>? teamMember;
+
+  factory Team.fromJson(Map<String, dynamic> json) => Team(
+        id: json["id"],
+        teamName: json["team_name"],
+        shiftId: json["shift_id"],
+        slotsPerDay: json["slots_per_day"],
+        isArchieved: json["is_archieved"],
+        createdAt: json["created_at"],
+        updatedAt: json["updated_at"],
+        teamMember: List<TeamMember>.from(
+            json["team_member"].map((x) => TeamMember.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "team_name": teamName,
+        "shift_id": shiftId,
+        "slots_per_day": slotsPerDay,
+        "is_archieved": isArchieved,
+        "created_at": createdAt,
+        "updated_at": updatedAt,
+        "team_member": List<dynamic>.from(teamMember!.map((x) => x.toJson())),
+      };
+}
+
+class TeamMember {
+  TeamMember({
+    this.id,
+    this.teamId,
+    this.userId,
+    this.createdAt,
+    this.updatedAt,
+    this.user,
+  });
+
+  int? id;
+  String? teamId;
+  String? userId;
+  String? createdAt;
+  String? updatedAt;
+  User? user;
+
+  factory TeamMember.fromJson(Map<String, dynamic> json) => TeamMember(
+        id: json["id"],
+        teamId: json["team_id"],
+        userId: json["user_id"],
+        createdAt: json["created_at"],
+        updatedAt: json["updated_at"],
+        user: User.fromJson(json["user"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "team_id": teamId,
+        "user_id": userId,
+        "created_at": createdAt,
+        "updated_at": updatedAt,
+        "user": user?.toJson(),
+      };
+}
+
 class User {
   User({
     this.id,
@@ -382,6 +469,7 @@ class User {
     this.deviceType,
     this.deviceId,
     this.age,
+    this.kaleyraUserId,
     this.pincode,
     this.isActive,
     this.addedBy,
@@ -407,6 +495,7 @@ class User {
   String? deviceType;
   String? deviceId;
   String? age;
+  String? kaleyraUserId;
   String? pincode;
   String? isActive;
   String? addedBy;
@@ -432,6 +521,7 @@ class User {
         deviceType: json["device_type"],
         deviceId: json["device_id"],
         age: json["age"],
+        kaleyraUserId: json["kaleyra_user_id"],
         pincode: json["pincode"],
         isActive: json["is_active"],
         addedBy: json["added_by"],
@@ -458,6 +548,7 @@ class User {
         "device_type": deviceType,
         "device_id": deviceId,
         "age": age,
+        "kaleyra_user_id": kaleyraUserId,
         "pincode": pincode,
         "is_active": isActive,
         "added_by": addedBy,

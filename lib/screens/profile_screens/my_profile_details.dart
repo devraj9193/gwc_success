@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-import '../../controller/user_profile_controller.dart';
+import '../../controller/api_service.dart';
+import '../../model/success_user_model/success_member_profile_repository.dart';
+import '../../model/success_user_model/success_member_service.dart';
 import '../../utils/constants.dart';
+import '../../utils/gwc_api.dart';
+import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
-import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
 class MyProfileDetails extends StatefulWidget {
   const MyProfileDetails({Key? key}) : super(key: key);
@@ -13,33 +18,44 @@ class MyProfileDetails extends StatefulWidget {
 }
 
 class _MyProfileDetailsState extends State<MyProfileDetails> {
-  UserProfileController userProfileController =
-      Get.put(UserProfileController());
+  final SharedPreferences _pref = GwcApi.preferences!;
+
+  String accessToken = "";
+  Future? getProfileDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    getProfileData();
+  }
+
+  getProfileData() {
+    accessToken = _pref.getString("token")!;
+    setState(() {});
+    print("accessToken: $accessToken");
+    getProfileDetails = SuccessMemberProfileService(repository: userRepository)
+        .getSuccessMemberProfileService(accessToken);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: buildAppBar(() {
+          Navigator.pop(context);
+        }),
+        backgroundColor: whiteTextColor,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.only(top: 2.h, left: 3.w),
-              child: buildAppBar(() {
-                Navigator.pop(context);
-              }),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 3.w),
+              padding: EdgeInsets.only(left: 3.w, top: 1.h, bottom: 2.h),
               child: Text(
                 "My Profile",
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontFamily: "GothamBold",
-                    color: gPrimaryColor,
-                    fontSize: 11.sp),
+                style: ProfileScreenText().headingText(),
               ),
             ),
-            SizedBox(height: 1.h),
             Expanded(
               child: buildUserDetails(),
             ),
@@ -51,7 +67,7 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
 
   buildUserDetails() {
     return FutureBuilder(
-        future: userProfileController.fetchUserProfile(),
+        future: getProfileDetails,
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasError) {
             return Padding(
@@ -72,14 +88,11 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
                     left: 0,
                     right: 0,
                     child: Container(
-                      height: 35.h,
+                      height: 40.h,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                              blurRadius: 2,
-                              color: Colors.grey.withOpacity(0.5))
-                        ],
+                        color: whiteTextColor,
+                        border: Border.all(
+                            width: 1, color: lightTextColor.withOpacity(0.3)),
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(15),
                           topRight: Radius.circular(15),
@@ -91,7 +104,7 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
                     ),
                   ),
                   Positioned(
-                    top: 33.h,
+                    top: 38.h,
                     left: 0,
                     right: 0,
                     child: Container(
@@ -102,7 +115,9 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
                               topRight: Radius.circular(12)),
-                          border: Border.all(width: 1, color: gMainColor)),
+                          border: Border.all(
+                              width: 1,
+                              color: lightTextColor.withOpacity(0.3))),
                       child: Column(
                         children: [
                           SizedBox(height: 3.h),
@@ -133,32 +148,25 @@ class _MyProfileDetailsState extends State<MyProfileDetails> {
         Row(
           // mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              heading,
-              style: TextStyle(
-                color: gBlackColor,
-                fontFamily: 'GothamMedium',
-                fontSize: 10.sp,
-              ),
-            ),
+            Text(heading, style: ProfileScreenText().nameText()),
             Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: gBlackColor,
-                  fontFamily: 'GothamBook',
-                  fontSize: 9.sp,
-                ),
-              ),
+              child: Text(title, style: ProfileScreenText().otherText()),
             ),
           ],
         ),
         Container(
           height: 1,
           margin: EdgeInsets.symmetric(vertical: 2.h),
-          color: Colors.grey.withOpacity(0.2),
+          color: lightTextColor.withOpacity(0.2),
         ),
       ],
     );
   }
+
+  final SuccessMemberProfileRepository userRepository =
+      SuccessMemberProfileRepository(
+    apiClient: ApiClient(
+      httpClient: http.Client(),
+    ),
+  );
 }

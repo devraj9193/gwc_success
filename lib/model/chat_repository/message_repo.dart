@@ -12,4 +12,9 @@ class MessageRepository {
   Future getGwcTeamChatGroupIdRepo(String userId) async {
     return await apiClient.getGwcTeamChatGroupId(userId);
   }
+
+  Future getAccessTokenRepo(String kaleyraUID) async{
+    return await apiClient.getKaleyraAccessTokenApi(kaleyraUID);
+  }
+
 }
