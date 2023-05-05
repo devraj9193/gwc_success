@@ -2,9 +2,8 @@ import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:gwc_success_team/screens/login_screen/success_login.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../model/quick_blox_service/quick_blox_service.dart';
+import '../model/chat_support/chat_support_method.dart';
 import '../utils/gwc_api.dart';
 import '../widgets/background_widget.dart';
 import 'bottom_bar/dashboard_screen.dart';
@@ -105,13 +104,20 @@ class _SplashScreenState extends State<SplashScreen> {
           print("message.data22 ${message.data['notification_type']}");
           if (message.data != null) {
             if (message.data['notification_type'] == 'new_chat') {
-              final accessToken = _pref.getString(GwcApi.kaleyraAccessToken);
               final uId = _pref.getString("kaleyraUserId");
 
-              final qbService =
-                  Provider.of<QuickBloxService>(context, listen: false);
-              await qbService.openKaleyraChat(
-                  "$uId", message.data["title"].toString(), "$accessToken");
+              final accessToken = _pref.getString(GwcApi.kaleyraAccessToken);
+
+              // chat
+              await openKaleyraChat(uId!, message.data["title"].toString(), accessToken!);
+
+              // final accessToken = _pref.getString(GwcApi.kaleyraAccessToken);
+              // final uId = _pref.getString("kaleyraUserId");
+              //
+              // final qbService =
+              //     Provider.of<QuickBloxService>(context, listen: false);
+              // await qbService.openKaleyraChat(
+              //     "$uId", message.data["title"].toString(), "$accessToken");
             }
           } else {
             await Navigator.push(

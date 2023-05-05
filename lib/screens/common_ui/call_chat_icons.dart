@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../../model/chat_support/chat_support_method.dart';
 import '../../model/customer_call_model.dart';
-import '../../model/quick_blox_service/quick_blox_service.dart';
+import '../../model/error_model.dart';
 import '../../utils/constants.dart';
 import '../../utils/gwc_api.dart';
 import '../../widgets/common_screen_widgets.dart';
@@ -31,22 +31,6 @@ class CallChatIcons extends StatefulWidget {
 class _CallChatIconsState extends State<CallChatIcons> {
   final SharedPreferences _pref = GwcApi.preferences!;
   CustomerCallModel? customerCallModel;
-
-  String kaleyraAccessToken = "";
-  String kaleyraUserId = "";
-
-  @override
-  void initState() {
-    super.initState();
-    getKaleyraDetails();
-  }
-
-  void getKaleyraDetails() async {
-    kaleyraAccessToken = _pref.getString(GwcApi.kaleyraAccessToken)!;
-    kaleyraUserId = _pref.getString("kaleyraUserId")!;
-    setState(() {});
-    print("kaleyraAccessToken: $kaleyraAccessToken");
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,11 +56,27 @@ class _CallChatIconsState extends State<CallChatIcons> {
         widget.chat
             ? const SizedBox()
             : GestureDetector(
-                onTap: () {
-                  final qbService =
-                      Provider.of<QuickBloxService>(context, listen: false);
-                  qbService.openKaleyraChat(kaleyraUserId,
-                      widget.kaleyraUserId.toString(), kaleyraAccessToken);
+                onTap: () async {
+                  final kaleyraUserId = _pref.getString("kaleyraUserId");
+                  final res = await getKaleyraAccessToken(kaleyraUserId!);
+
+                  if (res.runtimeType != ErrorModel) {
+                    final accessToken =
+                        _pref.getString(GwcApi.kaleyraAccessToken);
+
+                    // chat
+                    openKaleyraChat(kaleyraUserId,
+                        widget.kaleyraUserId.toString(), accessToken!);
+                  } else {
+                    final result = res as ErrorModel;
+                    print("get Access Token error: ${result.message}");
+                    GwcApi().showSnackBar(context, result.message ?? '',
+                        isError: true, bottomPadding: 70);
+                  }
+                  // final qbService =
+                  //     Provider.of<QuickBloxService>(context, listen: false);
+                  // qbService.openKaleyraChat(kaleyraUserId,
+                  //     widget.kaleyraUserId.toString(), kaleyraAccessToken);
                 },
                 child: Image.asset(
                   'assets/images/Group 4891.png',
@@ -172,7 +172,6 @@ class _CallChatIconsState extends State<CallChatIcons> {
   }
 
   customersCall(String userId) async {
-
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var token = preferences.getString("token")!;
 

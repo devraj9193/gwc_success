@@ -33,7 +33,6 @@ class _CalenderScreenState extends State<CalenderScreen> {
   final searchController = TextEditingController();
   CustomersList? customersList;
   List<Datum> searchResults = [];
-  final SharedPreferences _pref = GwcApi.preferences!;
 
   String? _subjectText = '',
       _startTimeText = '',
@@ -42,21 +41,11 @@ class _CalenderScreenState extends State<CalenderScreen> {
       _timeDetails = '';
   // Color? _headerColor, _viewHeaderColor, _calendarColor;
 
-  String kaleyraAccessToken = "";
-  String kaleyraUserId = "";
-
-  void getKaleyraDetails() async {
-    kaleyraAccessToken = _pref.getString(GwcApi.kaleyraAccessToken)!;
-    kaleyraUserId = _pref.getString("kaleyraUserId")!;
-    setState(() {});
-    print("kaleyraAccessToken: $kaleyraAccessToken");
-  }
 
   @override
   void initState() {
     super.initState();
     fetchCustomersList();
-    getKaleyraDetails();
     searchController.addListener(() {
       setState(() {});
     });
@@ -344,7 +333,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
       return;
     }
     customersList?.data.forEach((userDetail) {
-      if (userDetail.fname!.toLowerCase().contains(text.trim().toLowerCase())) {
+      if (userDetail.fname!.toLowerCase().contains(text.toLowerCase()) ||
+          userDetail.lname!.toLowerCase().contains(
+              text.toLowerCase())) {
         searchResults.add(userDetail);
       }
     });

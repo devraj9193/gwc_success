@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,5 +101,18 @@ class GwcApi {
   static Future<String?> getDeviceId() async {
     String? deviceId = await PlatformDeviceId.getDeviceId;
     return deviceId;
+  }
+
+  showSnackBar(BuildContext context, String message,{int? duration, bool? isError, SnackBarAction? action, double? bottomPadding}){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor:(isError == null || isError == false) ? gPrimaryColor : gSecondaryColor.withOpacity(0.55),
+        content: Text(message),
+        margin: (bottomPadding != null) ? EdgeInsets.only(bottom: bottomPadding) : null,
+        duration: Duration(seconds: duration ?? 3),
+        action: action,
+      ),
+    );
   }
 }

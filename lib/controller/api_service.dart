@@ -14,6 +14,8 @@ class ApiClient {
   final http.Client httpClient;
   SharedPreferences? preferences;
 
+  final _prefs = GwcApi.preferences;
+
   getChatGroupId(String userId) async {
     String path = GwcApi.customerChatListApiUrl;
 
@@ -93,38 +95,6 @@ class ApiClient {
     return result;
   }
 
-  Future getKaleyraAccessTokenApi(String kaleyraUID) async {
-    dynamic result;
-    // production or sandbox
-    // final environment = "sandbox";
-    // final region = "eu";
-    // testing api key: ak_live_c1ef0ed161003e0a2b419d20
-    // final endPoint = "https://cs.${environment}.${region}.bandyer.com";
-
-    var kaleyraUID = preferences?.getString("kaleyraUserd")!;
-    print("kaleyraUID : $kaleyraUID");
-
-    final endPoint = "https://api.in.bandyer.com";
-
-    final String url = "$endPoint/rest/sdk/credentials";
-    try {
-      final response = await httpClient.post(Uri.parse(url),
-          headers: {'apikey': 'ak_live_d2ad6702fe931fbeb2fa9cb4'},
-          body: {"user_id": kaleyraUID});
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        result = json['access_token'];
-        preferences?.setString(GwcApi.kaleyraAccessToken, result);
-      } else {
-        final json = jsonDecode(response.body);
-        result = ErrorModel.fromJson(json);
-      }
-    } catch (e) {
-      result = ErrorModel(status: "", message: e.toString());
-    }
-    return result;
-  }
-
   Future getSuccessMemberProfileApi(String accessToken) async {
     final path = GwcApi.getUserProfileApiUrl;
     var result;
@@ -161,4 +131,43 @@ class ApiClient {
     }
     return result;
   }
+
+  Future getKaleyraAccessTokenApi(String kaleyraUID) async{
+    dynamic result;
+    // production or sandbox
+    // final environment = "sandbox";
+    // final region = "eu";
+    // testing api key: ak_live_c1ef0ed161003e0a2b419d20
+    // final endPoint = "https://cs.${environment}.${region}.bandyer.com";
+    /// live endpoint
+    const endPoint = "https://api.in.bandyer.com";
+
+    const String url = "$endPoint/rest/sdk/credentials";
+    try{
+
+      final response = await httpClient.post(Uri.parse(url),
+          headers: {
+            'apikey': 'ak_live_d2ad6702fe931fbeb2fa9cb4'
+          },
+          body: {
+            "user_id": kaleyraUID
+          }
+      );
+      if(response.statusCode == 200){
+        final json = jsonDecode(response.body);
+        result = json['access_token'];
+        print("access token got");
+        _prefs!.setString(GwcApi.kaleyraAccessToken, result);
+      }
+      else{
+        final json = jsonDecode(response.body);
+        result = ErrorModel.fromJson(json);
+      }
+    }
+    catch(e){
+      result = ErrorModel(status: "", message: e.toString());
+    }
+    return result;
+  }
+
 }

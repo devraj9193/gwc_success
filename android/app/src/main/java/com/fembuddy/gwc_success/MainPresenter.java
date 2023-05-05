@@ -51,6 +51,10 @@ import com.kaleyra.app_utilities.storage.ConfigurationPrefsManager;
 import com.kaleyra.app_utilities.storage.LoginManager;
 import com.kaleyra.collaboration_suite_networking.Environment;
 import com.kaleyra.collaboration_suite_networking.Region;
+import com.kaleyra.collaboration_suite_utils.logging.AndroidPriorityLoggerKt;
+import com.kaleyra.collaboration_suite_utils.logging.BaseLogger;
+import com.kaleyra.collaboration_suite_utils.logging.PriorityLogger;
+import com.bandyer.android_sdk.utils.BandyerSDKLoggerKt;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -66,7 +70,7 @@ public class MainPresenter extends AppCompatActivity implements BandyerModuleObs
     protected Activity mContext;
 
     EventChannel.EventSink events;
-// producation
+    // producation
     String apiKey = "ak_live_d2ad6702fe931fbeb2fa9cb4";
     String appId = "mAppId_a4908f3e2fa60c828daff5e875b0af422545696fa0bffa76d614489aae8d";
 
@@ -117,10 +121,14 @@ public class MainPresenter extends AppCompatActivity implements BandyerModuleObs
     }
 
     private void sdkConfig(String userId, String accessToken){
+        PriorityLogger logger = null;
+
+        logger = AndroidPriorityLoggerKt.androidPrioryLogger(BaseLogger.ERROR, BandyerSDKLoggerKt.SDK);
+
         BandyerSDKConfiguration.Builder builder1 = new BandyerSDKConfiguration.Builder(
                 appId,
                 environment,
-                region);
+                region).logger(logger);
 
         builder1.tools(builder -> {
             builder.withCall(configurableCall -> {
@@ -308,9 +316,9 @@ public class MainPresenter extends AppCompatActivity implements BandyerModuleObs
             android.util.Log.d(TAG, "onCallCreated");
             resultMap = new HashMap<String, String>()
             {{
-                    put("status", "onCallCreated");
-                    put("data", String.valueOf(ongoingCall.getCallInfo()));
-                }};
+                put("status", "onCallCreated");
+                put("data", String.valueOf(ongoingCall.getCallInfo()));
+            }};
             Log.d("evenets:=>", events.toString());
             Log.d("resultMap", resultMap.toString());
             if(events != null)
@@ -429,7 +437,7 @@ public class MainPresenter extends AppCompatActivity implements BandyerModuleObs
     }
 
     public void updatePayload(String payload){
-      BandyerSDK.getInstance().handleNotification(payload);
+        BandyerSDK.getInstance().handleNotification(payload);
     }
 
     public void openChat(String userId, String opponentUserId,String accessToken, MethodChannel.Result result){
@@ -450,6 +458,13 @@ public class MainPresenter extends AppCompatActivity implements BandyerModuleObs
         @Override
         public void onActivityError(@NonNull Chat chat, @NonNull WeakReference<AppCompatActivity> activity, @NonNull ChatException error) {
             Log.e(TAG, "onChatActivityError " + error.getMessage());
+            resultMap = new HashMap<String, String>()
+            {{
+                put("status", "onChatActivityError");
+                put("error", error.getMessage());
+            }};
+            if(events != null)
+                events.success(resultMap);
         }
 
         @Override
@@ -490,15 +505,15 @@ public class MainPresenter extends AppCompatActivity implements BandyerModuleObs
                 environment,
                 region);
 
-     builder1.tools(builder -> {
+        builder1.tools(builder -> {
             // Set chat configuration created above
             builder.withChat(configurableChat -> {
                         configurableChat.setChatConfiguration(chatConfiguration);
                     }
             );
-     }).notificationListeners(builder -> {
-         builder.setChatNotificationListener(getChatNotificationListener());
-     }).build();
+        }).notificationListeners(builder -> {
+            builder.setChatNotificationListener(getChatNotificationListener());
+        }).build();
 
         BandyerSDK.getInstance().configure(builder1.build());
 

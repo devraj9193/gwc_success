@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import '../../../controller/linked_customers_controller.dart';
-import '../../../utils/gwc_api.dart';
 import '../../../widgets/common_screen_widgets.dart';
 import '../../../widgets/widgets.dart';
 import '../../common_ui/call_chat_icons.dart';
@@ -17,25 +16,8 @@ class AllCustomersList extends StatefulWidget {
 }
 
 class _AllCustomersListState extends State<AllCustomersList> {
-  final SharedPreferences _pref = GwcApi.preferences!;
 
-  String kaleyraAccessToken = "";
-  String kaleyraUserId = "";
-
-  @override
-  void initState() {
-    super.initState();
-    getKaleyraDetails();
-  }
-
-  void getKaleyraDetails() async {
-    kaleyraAccessToken = _pref.getString(GwcApi.kaleyraAccessToken)!;
-    kaleyraUserId = _pref.getString("kaleyraUserId")!;
-    setState(() {});
-    print("kaleyraAccessToken: $kaleyraAccessToken");
-  }
-
-  LinkedCustomersController linkedCustomersController =
+   LinkedCustomersController linkedCustomersController =
       Get.put(LinkedCustomersController());
 
   @override

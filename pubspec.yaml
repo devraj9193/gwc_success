@@ -45,7 +45,7 @@ dependencies:
   flutter_spinkit: any
   get: any
   flutter_svg: any
-  grouped_list: any
+#  grouped_list: any
 #  quickblox_sdk: ^0.6.0-beta
   url_launcher: ^6.1.2
   percent_indicator: ^4.2.2
@@ -63,11 +63,20 @@ dependencies:
   provider: any
   path_provider: any
   image_picker: any
-  flutter_sim_country_code: ^0.1.2
+#  flutter_sim_country_code: ^0.1.2
   mime: any
   photo_view: any
   catcher: ^0.7.0
   cached_network_image: any
+
+  # internet checking
+  internet_connection_checker: any
+  connectivity_plus: any
+  data_connection_checker_nulls: ^0.0.2
+
+  #app update
+  upgrader: ^6.3.0
+  store_redirect: ^2.0.1
 
 dev_dependencies:
   flutter_test:

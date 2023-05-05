@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import '../../controller/gwc_team_controller.dart';
-import '../../model/quick_blox_service/quick_blox_service.dart';
+import '../../model/chat_support/chat_support_method.dart';
+import '../../model/error_model.dart';
 import '../../utils/constants.dart';
 import '../../utils/gwc_api.dart';
 import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/pop_up_menu_widget.dart';
 import 'package:get/get.dart';
 import '../../widgets/widgets.dart';
-import '../common_ui/show_profile.dart';
 
 class GwcTeamsScreen extends StatefulWidget {
   const GwcTeamsScreen({Key? key}) : super(key: key);
@@ -126,15 +125,13 @@ class _GwcTeamsScreenState extends State<GwcTeamsScreen> {
                                         children: [
                                           Text(
                                             "Sign up Date : ",
-                                            style:
-                                            AllListText().otherText(),
+                                            style: AllListText().otherText(),
                                           ),
                                           Expanded(
                                             child: Text(
                                               data[index].signupDate ?? "",
                                               maxLines: 1,
-                                              overflow:
-                                              TextOverflow.ellipsis,
+                                              overflow: TextOverflow.ellipsis,
                                               style: AllListText()
                                                   .subHeadingText(),
                                             ),
@@ -146,26 +143,55 @@ class _GwcTeamsScreenState extends State<GwcTeamsScreen> {
                                 ),
                                 PopUpMenuWidget(
                                   onView: () {
-                                   // Get.to(() => const ShowProfile(),);
+                                    // Get.to(() => const ShowProfile(),);
                                     saveUserId(data[index].id.toString());
                                   },
                                   onCall: () {
                                     saveUserId(data[index].id.toString());
                                   },
-                                  onMessage: () {
-                                    final accessToken = _pref
-                                        .getString(GwcApi.kaleyraAccessToken);
-                                    final uId =
+                                  onMessage: () async {
+                                    final kaleyraUserId =
                                         _pref.getString("kaleyraUserId");
-                                    saveUserId(data[index].id.toString());
-                                    print("Doctor Chat Id : ${data[index].kaleyraUserId.toString()}");
-                                    final qbService =
-                                        Provider.of<QuickBloxService>(context,
-                                            listen: false);
-                                    qbService.openKaleyraChat(
-                                        "$uId",
-                                        data[index].kaleyraUserId.toString(),
-                                        "$accessToken");
+                                    final res = await getKaleyraAccessToken(
+                                        kaleyraUserId!);
+
+                                    if (res.runtimeType != ErrorModel) {
+                                      final accessToken = _pref
+                                          .getString(GwcApi.kaleyraAccessToken);
+
+                                      // chat
+                                      // final qbService =
+                                      //     Provider.of<QuickBloxService>(context,
+                                      //         listen: false);
+                                      // qbService.openKaleyraChat(
+                                      //     "$kaleyraUserId",
+                                      //     data[index].kaleyraUserId.toString(),
+                                      //     "$accessToken");
+                                      openKaleyraChat(
+                                          kaleyraUserId,
+                                          data[index].kaleyraUserId.toString(),
+                                          accessToken!);
+                                    } else {
+                                      final result = res as ErrorModel;
+                                      print(
+                                          "get Access Token error: ${result.message}");
+                                      GwcApi().showSnackBar(
+                                          context, result.message ?? '',
+                                          isError: true, bottomPadding: 70);
+                                    }
+                                    // final accessToken = _pref
+                                    //     .getString(GwcApi.kaleyraAccessToken);
+                                    // final uId =
+                                    //     _pref.getString("kaleyraUserId");
+                                    // saveUserId(data[index].id.toString());
+                                    // print("Doctor Chat Id : ${data[index].kaleyraUserId.toString()}");
+                                    // final qbService =
+                                    //     Provider.of<QuickBloxService>(context,
+                                    //         listen: false);
+                                    // qbService.openKaleyraChat(
+                                    //     "$uId",
+                                    //     data[index].kaleyraUserId.toString(),
+                                    //     "$accessToken");
                                     // getChatGroupId(
                                     //   data[index].name ?? "",
                                     //   data[index].profile.toString(),

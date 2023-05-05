@@ -1,27 +1,18 @@
+import 'dart:async';
 import 'dart:io';
-import 'package:catcher/catcher.dart';
-
-import 'package:device_preview/device_preview.dart' hide DeviceType;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_sim_country_code/flutter_sim_country_code.dart';
 import 'package:get/get.dart';
-import 'package:gwc_success_team/screens/dashboard/notification_screen.dart';
-import 'package:gwc_success_team/utils/constants.dart';
 import 'package:gwc_success_team/utils/gwc_api.dart';
 import 'package:gwc_success_team/utils/http_override.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-import 'model/quick_blox_repository/quick_blox_repository.dart';
-import 'model/quick_blox_service/quick_blox_service.dart';
+import 'model/internet_connection/dependency_injecion.dart';
 import 'screens/splash_screen.dart';
-import '../model/quick_blox_repository/quick_blox_repository.dart';
-import '../utils/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:upgrader/upgrader.dart';
+import 'package:store_redirect/store_redirect.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
   print(message.data.toString());
@@ -51,7 +42,7 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
   HttpOverrides.global = MyHttpOverrides();
   GwcApi.preferences = await SharedPreferences.getInstance();
- // cacheManager();
+  // cacheManager();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
       overlays: [SystemUiOverlay.bottom]);
   SystemChrome.setSystemUIOverlayStyle(
@@ -98,6 +89,9 @@ Future<void> main() async {
   // print("fcmToken: $fcmToken");
 
   // *****  end *************
+  await Upgrader.clearSavedSettings();
+
+  DependencyInjection.init();
   runApp(const MyApp());
 
   // QuickBloxRepository().init(appId, authKey, authSecret, accountKey);
@@ -123,45 +117,67 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    getDeviceId();
+    super.initState();
+  }
 
   getDeviceId() async {
-    final _pref = GwcApi.preferences;
+    final pref = GwcApi.preferences;
     await GwcApi.getDeviceId().then((id) {
       print("deviceId: $id");
       if (id != null) {
-        _pref!.setString("deviceId", id);
+        pref!.setString("deviceId", id);
       }
     });
 
-    // this is for getting the state and city name
-    // this was not using currently
-    String? n = await FlutterSimCountryCode.simCountryCode;
-    if (n != null) _pref!.setString("COUNTRY_CODE", n);
-    // print("country_code:${n}");
-
     String? fcmToken = await FirebaseMessaging.instance.getToken();
-    _pref!.setString("fcm_token", fcmToken!);
+    pref!.setString("fcm_token", fcmToken!);
   }
 
   @override
-  void initState() {
-    super.initState();
-    getDeviceId();
-      }
-
-  @override
   Widget build(BuildContext context) {
+    // const appCastURL =
+    //     'https://raw.githubusercontent.com/larryaasen/upgrader/master/test/testappcast.xml';
+    // final cfg = AppcastConfiguration(url: appCastURL, supportedOS: ['android']);
+
     return Sizer(builder:
         (BuildContext context, Orientation orientation, DeviceType deviceType) {
-      return MultiProvider(
-        providers: [
-          ListenableProvider<QuickBloxService>.value(value: QuickBloxService()),
-        ],
-        child: const GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: SplashScreen(),
+      return GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: UpgradeAlert(
+          upgrader: Upgrader(
+            // appcastConfig: cfg,
+            durationUntilAlertAgain: const Duration(days: 1),
+            dialogStyle: Platform.isIOS
+                ? UpgradeDialogStyle.cupertino
+                : UpgradeDialogStyle.material,
+            shouldPopScope: () => true,
+            messages: UpgraderMessages(code: 'en'),
+            onIgnore: () {
+              SystemNavigator.pop();
+              throw UnsupportedError('_');
+            },
+            onUpdate: () {
+              launchURL();
+              return true;
+            },
+            onLater: () {
+              SystemNavigator.pop();
+              throw UnsupportedError('_');
+            },
+          ),
+          child: const SplashScreen(),
         ),
       );
     });
+  }
+
+  launchURL() async {
+    StoreRedirect.redirect(
+        androidAppId: "com.fembuddy.success",
+        // iOSAppId: "284882215",
+    );
   }
 }

@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gwc_success_team/screens/bottom_bar/dashboard_screen.dart';
 import 'package:gwc_success_team/widgets/unfocus_widget.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 import '../../controller/api_service.dart';
-import '../../model/quick_blox_service/quick_blox_service.dart';
 import '../../model/success_user_model/success_member_profile_repository.dart';
 import '../../model/success_user_model/success_member_service.dart';
 import '../../model/user_profile_model.dart';
@@ -390,13 +388,13 @@ class _SuccessLoginState extends State<SuccessLogin> {
             setState(() {
               isLoading = true;
             });
-            final qbService =
-                Provider.of<QuickBloxService>(context, listen: false);
+            // final qbService =
+            //     Provider.of<QuickBloxService>(context, listen: false);
             // qbService.login(responseData["user"]["login_username"].toString());
 
             buildSnackBar("Login", "Successful");
-            qbService.kaleyraLogin(
-                responseData["user"]["kaleyra_user_id"].toString());
+            // qbService.kaleyraLogin(
+            //     responseData["user"]["kaleyra_user_id"].toString());
             storeUserProfile(responseData["access_token"]);
             Get.to(() => const DashboardScreen());
           } else if (responseData['status'] == 401) {

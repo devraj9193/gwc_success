@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import '../../../controller/meal_active_list_controller.dart';
-import '../../../model/quick_blox_service/quick_blox_service.dart';
-import '../../../utils/gwc_api.dart';
 import '../../../widgets/common_screen_widgets.dart';
 import '../../../widgets/widgets.dart';
 import '../../common_ui/call_chat_icons.dart';
@@ -20,23 +17,7 @@ class ActiveList extends StatefulWidget {
 }
 
 class _ActiveListState extends State<ActiveList> {
-  final SharedPreferences _pref = GwcApi.preferences!;
   String statusText = "";
-  String kaleyraAccessToken = "";
-  String kaleyraUserId = "";
-
-  @override
-  void initState() {
-    super.initState();
-    getKaleyraDetails();
-  }
-
-  void getKaleyraDetails() async {
-    kaleyraAccessToken = _pref.getString(GwcApi.kaleyraAccessToken)!;
-    kaleyraUserId = _pref.getString("kaleyraUserId")!;
-    setState(() {});
-    print("kaleyraAccessToken: $kaleyraAccessToken");
-  }
 
   MealActiveListController mealActiveListController =
       Get.put(MealActiveListController());

@@ -71,7 +71,7 @@ class Datum {
         team: (json['team'] == null || json['team'].runtimeType == int)
             ? null
             : Team.fromJson(json["team"]),
-      kaleyraUserId: json["kaleyra_user_id"].toString(),
+        kaleyraUserId: json["kaleyra_user_id"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -83,7 +83,7 @@ class Datum {
         "time": time,
         "profile": profile,
         "team": team,
-    "kaleyra_user_id":kaleyraUserId,
+        "kaleyra_user_id": kaleyraUserId,
       };
 }
 

@@ -1,24 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
-
-import '../../../controller/api_service.dart';
 import '../../../controller/consultation_controller.dart';
-import '../../../model/chat_repository/message_repo.dart';
-import '../../../model/chat_service/chat_service.dart';
-import '../../../model/error_model.dart';
-import '../../../model/message_model/get_chat_groupid_model.dart';
-import '../../../model/quick_blox_service/quick_blox_service.dart';
-import '../../../utils/gwc_api.dart';
 import '../../../widgets/common_screen_widgets.dart';
 import '../../../widgets/widgets.dart';
 import '../../common_ui/call_chat_icons.dart';
 import '../../common_ui/show_profile.dart';
-import '../../message_screen/message_screen.dart';
 
 class ConsultationPendingList extends StatefulWidget {
   const ConsultationPendingList({Key? key}) : super(key: key);
