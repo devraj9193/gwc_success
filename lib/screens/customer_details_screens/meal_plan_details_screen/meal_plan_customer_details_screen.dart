@@ -15,16 +15,19 @@ class MealPlanCustomerDetailsScreen extends StatefulWidget {
   final String finalDiagnosis;
   final String preparatoryCurrentDay;
   final String transitionCurrentDay;
-  const MealPlanCustomerDetailsScreen(
-      {Key? key,
-      required this.userName,
-      required this.age,
-      required this.appointmentDetails,
-      required this.status,
-      required this.finalDiagnosis,
-      required this.preparatoryCurrentDay,
-      required this.transitionCurrentDay})
-      : super(key: key);
+  final String isPrepCompleted;
+
+  const MealPlanCustomerDetailsScreen({
+    Key? key,
+    required this.userName,
+    required this.age,
+    required this.appointmentDetails,
+    required this.status,
+    required this.finalDiagnosis,
+    required this.preparatoryCurrentDay,
+    required this.transitionCurrentDay,
+    required this.isPrepCompleted,
+  }) : super(key: key);
 
   @override
   State<MealPlanCustomerDetailsScreen> createState() =>
@@ -72,27 +75,27 @@ class _MealPlanCustomerDetailsScreenState
                     ),
                   ],
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Final Diagnosis : ",
-                      style: AllListText().otherText(),
-                    ),
-                    Expanded(
-                      child: RichText(
-                        text: TextSpan(
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: widget.finalDiagnosis,
-                              style: AllListText().subHeadingText(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     Text(
+                //       "Final Diagnosis : ",
+                //       style: AllListText().otherText(),
+                //     ),
+                //     Expanded(
+                //       child: RichText(
+                //         text: TextSpan(
+                //           children: <TextSpan>[
+                //             TextSpan(
+                //               text: widget.finalDiagnosis,
+                //               style: AllListText().subHeadingText(),
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
                 SizedBox(height: 1.h),
                 TabBar(
                     labelColor: tapSelectedColor,
@@ -119,6 +122,7 @@ class _MealPlanCustomerDetailsScreenState
                       preparatoryCurrentDay: widget.preparatoryCurrentDay,
                       ppCurrentDay: widget.preparatoryCurrentDay,
                       presDay: widget.transitionCurrentDay,
+                      isPrepCompleted: widget.isPrepCompleted,
                     ),
                     MealPlanDetails(),
                     // EvaluationDetails(),

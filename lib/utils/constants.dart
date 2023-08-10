@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
+// const baseUrl = "https://gwc.disol.in";
+const baseUrl = "https://gutandhealth.com";
+const uvBaseUrl = "https://support.gutandhealth.com/public/api/v1";
+
 const gPrimaryColor = Color(0xff4E7215);
 const gSecondaryColor = Color(0xffEE1004);
 
@@ -14,11 +18,17 @@ const gMainColor = Color(0xffFFE889);
 // const gMainColor = Color(0xffC7A102);
 const gTextColor = Color(0xff2D414B);
 const gTapColor = Color(0xffF8FAFF);
-const gBackgroundColor = Color(0xffFFE889);
+// const gBackgroundColor = Color(0xffFFE889);
 const gPdfColor = Color(0xffFCF6F0);
 const chartBackGroundColor = Color(0xffECF0F4);
 
 const gChatMeColor = Color(0xFFd4ff90);
+const gBackgroundColor = Color(0xffFAFAFA);
+const gHintTextColor = Color(0xff676363);
+
+const kBottomSheetHeadYellow = Color(0xffFFE281);
+const kBottomSheetHeadGreen = Color(0xffA7C652);
+const kBottomSheetHeadCircleColor = Color(0xffFFF9F8);
 
 const kPrimaryColor = Color(0xffBB0A36);
 const kSecondaryColor = Color(0xffFFF5F5);
@@ -33,7 +43,9 @@ const kSoundColor = Color(0xffE6A790);
 const kDetailsColor = Color(0xffFF5A7F);
 const kHealthColor = Color(0xffD10034);
 
-const baseUrl = "https://gwc.disol.in";
+const newDashboardGreenButtonColor = Color(0xffA7CB52);
+const newDashboardLightGreyButtonColor = Color(0xffB9B4B4);
+
 
 const String appId = "99437";
 const String authKey = "zhVfP2jWfvrhe2r";
@@ -56,6 +68,12 @@ const String kFontBlack = 'GothamBlack';
 const String kFontPoppinsRegular = 'PoppinsRegular';
 
 const kButtonColor = Color(0xffD10034);
+
+// new dashboard colors
+const kNumberCircleRed = Color(0xffEF8484);
+const kNumberCirclePurple = Color(0xff9C7ADF);
+const kNumberCircleAmber = Color(0xffFFBD59);
+const kNumberCircleGreen = Color(0xffA7CB52);
 
 class eUser {
   var kRadioButtonColor = gSecondaryColor;
@@ -224,3 +242,10 @@ const mediumTextColor = Color(0xff676363);
 const lightTextColor = Color(0xffB9B4B4);
 const whiteTextColor = Color(0xffFFFFFF);
 const dashboardTextColor = Color(0xffC7A102);
+
+const bsHeadPinIcon = "assets/images/bs-head-pin.png";
+const bsHeadBellIcon = "assets/images/bs-head-bell.png";
+const bsHeadBulbIcon = "assets/images/bs-head-bulb.png";
+const bsHeadStarsIcon = "assets/images/bs-head-stars.png";
+
+

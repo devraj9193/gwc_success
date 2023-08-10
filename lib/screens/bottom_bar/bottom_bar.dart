@@ -44,9 +44,10 @@ class _BottomBarState extends State<BottomBar> {
               index: 2,
               image: 'assets/images/chat_bottom.png',
             ),
-            // buildTabView2(
-            //   index: 3,
-            // ),
+            buildTabView(
+              index: 3,
+              image: 'assets/images/Group 3011.png',
+            ),
             buildTabView1(
               index: 4,
               image: 'assets/images/profile_bottom.png',

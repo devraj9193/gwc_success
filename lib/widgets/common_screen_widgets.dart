@@ -142,6 +142,41 @@ class AllListText {
       fontSize: fontSize08,
     );
   }
+
+  TextStyle deliveryDateOtherText() {
+    return TextStyle(
+      height: 1.3,
+      fontFamily: fontBook,
+      color: gSecondaryColor,
+      fontSize: fontSize08,
+    );
+  }
+
+  TextStyle requestedDate (){
+    return TextStyle(
+        height: 1.3,
+        fontFamily: fontMedium,
+        color: gSecondaryColor,
+      fontSize: fontSize08,
+    );
+  }
+
+  TextStyle deliveryDateText(String status) {
+    return TextStyle(
+      height: 1.3,
+      fontFamily: fontMedium,
+      color:status == "shipping_paused" ? gSecondaryColor : status == "shipping_approved" ? Colors.blue : gPrimaryColor,
+      fontSize: fontSize08,
+    );
+  }
+
+  TextStyle getProgramStatus() {
+    return TextStyle(
+        height: 1.3,
+        fontFamily: fontMedium,
+        color: gPrimaryColor,
+        fontSize: fontSize08);
+  }
 }
 
 class ProfileScreenText {
@@ -217,7 +252,6 @@ class EvaluationText {
 }
 
 class MealPlan {
-
   TextStyle tabText() {
     return TextStyle(
       fontFamily: fontBold,
@@ -261,7 +295,7 @@ class MealPlan {
 
   TextStyle benefitsText() {
     return TextStyle(
-       height: 1.3,
+      height: 1.3,
       fontFamily: fontBook,
       color: newBlackColor,
       fontSize: fontSize07,
@@ -284,10 +318,37 @@ class MealPlan {
       fontSize: fontSize08,
     );
   }
+  TextStyle trackerHeading() {
+    return TextStyle(
+      height: 1.5,
+      fontFamily: fontBold,
+      color: newBlackColor,
+      fontSize: fontSize09,
+    );
+  }
+
+  TextStyle trackerSubHeading() {
+    return TextStyle(
+      height: 1.5,
+      fontFamily: fontMedium,
+      color: newBlackColor,
+      fontSize: fontSize08,
+    );
+  }
+
+  TextStyle trackerAnswer() {
+    return TextStyle(
+      height: 1.5,
+      fontFamily: fontBook,
+      color: newBlackColor,
+      fontSize: fontSize08,
+    );
+  }
+
 }
 
 class DialogTextStyles {
-  TextStyle headingText(){
+  TextStyle headingText() {
     return TextStyle(
       color: newBlackColor,
       fontFamily: fontBold,
@@ -295,7 +356,7 @@ class DialogTextStyles {
     );
   }
 
-  TextStyle subHeadingText(){
+  TextStyle subHeadingText() {
     return TextStyle(
       fontFamily: fontBook,
       color: newBlackColor,
@@ -303,18 +364,50 @@ class DialogTextStyles {
     );
   }
 
-  TextStyle cancelText(){
-    return  TextStyle(
+  TextStyle cancelText() {
+    return TextStyle(
       color: newBlackColor,
       fontFamily: fontMedium,
       fontSize: fontSize09,
     );
   }
-  TextStyle logoutText(){
+
+  TextStyle logoutText() {
     return TextStyle(
       color: whiteTextColor,
       fontFamily: fontMedium,
       fontSize: fontSize09,
     );
   }
+}
+
+class TrackingText {
+  TextStyle headingText() {
+    return TextStyle(
+      height: 1.3,
+      fontFamily: fontBold,
+      color: newBlackColor,
+      fontSize: fontSize09,
+    );
+  }
+
+  TextStyle subHeadingText() {
+    return TextStyle(
+      height: 1.2,
+      fontFamily: fontMedium,
+      color: newBlackColor,
+      fontSize: fontSize08,
+    );
+  }
+
+  TextStyle otherText() {
+    return TextStyle(
+      height: 1.7,
+      fontFamily: fontBook,
+      color: newBlackColor,
+      fontSize: fontSize07,
+    );
+  }
+
+
 }

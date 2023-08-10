@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-import '../../controller/api_service.dart';
+import '../../service/api_service.dart';
 import '../../model/success_user_model/success_member_profile_repository.dart';
 import '../../model/success_user_model/success_member_service.dart';
 import '../../utils/constants.dart';

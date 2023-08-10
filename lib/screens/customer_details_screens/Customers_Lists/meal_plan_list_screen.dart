@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-import '../../../controller/meal_active_list_controller.dart';
+import 'package:http/http.dart' as http;
+import '../../../model/error_model.dart';
+import '../../../model/meal_active_model.dart';
+import '../../../repository/customer_status_repo.dart/customer_status_repo.dart';
+import '../../../service/api_service.dart';
+import '../../../service/customer_status_service/customer_status_service.dart';
 import '../../../utils/constants.dart';
 import '../../../widgets/common_screen_widgets.dart';
 import '../../../widgets/widgets.dart';
 import '../../common_ui/call_chat_icons.dart';
 import '../../common_ui/show_profile.dart';
-import '../meal_plan_details_screen/meal_plan_customer_details_screen.dart';
+import '../../nutri_delight_screens/nutri_delight_screen.dart';
 
 class MealPlanListScreen extends StatefulWidget {
   const MealPlanListScreen({Key? key}) : super(key: key);
@@ -20,306 +23,643 @@ class MealPlanListScreen extends StatefulWidget {
 class _MealPlanListScreenState extends State<MealPlanListScreen> {
   String statusText = "";
 
-  MealActiveListController mealActiveListController =
-      Get.put(MealActiveListController());
+  final searchController = TextEditingController();
+
+  bool showProgress = false;
+  MealActiveModel? mealActiveModel;
+  List<UserDetails> searchResults = [];
+  final ScrollController _scrollController = ScrollController();
+
+  TabController? tabController;
+
+  late final CustomerStatusService customerStatusService =
+      CustomerStatusService(customerStatusRepo: repository);
+
+  @override
+  void initState() {
+    super.initState();
+    getClaimedCustomerList();
+  }
+
+  getClaimedCustomerList() async {
+    setState(() {
+      showProgress = true;
+    });
+    callProgressStateOnBuild(true);
+    final result = await customerStatusService.getMealActiveService();
+    print("result: $result");
+
+    if (result.runtimeType == MealActiveModel) {
+      print("Ticket List");
+      MealActiveModel model = result as MealActiveModel;
+
+      mealActiveModel = model;
+    } else {
+      ErrorModel model = result as ErrorModel;
+      print("error: ${model.message}");
+      setState(() {
+        showProgress = false;
+      });
+    }
+    setState(() {
+      showProgress = false;
+    });
+    print(result);
+  }
+
+  callProgressStateOnBuild(bool value) {
+    Future.delayed(Duration.zero).whenComplete(() {
+      setState(() {
+        showProgress = value;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 3.w),
-      physics: const BouncingScrollPhysics(),
-      child: FutureBuilder(
-          future: mealActiveListController.fetchMealPlanList(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            if (snapshot.hasError) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 20.h),
-                child: Image(
-                  image: const AssetImage("assets/images/Group 5294.png"),
-                  height: 25.h,
-                ),
-              );
-            } else if (snapshot.hasData) {
-              var data = snapshot.data;
-              return Column(
+    List<UserDetails> mealList = mealActiveModel?.mealPlanList ?? [];
+
+    return (showProgress)
+        ? Center(
+            child: buildCircularIndicator(),
+          )
+        : mealList.isEmpty
+            ? buildNoData()
+            : Column(
                 children: [
-                  Container(
-                    height: 1,
-                    color: Colors.grey.withOpacity(0.3),
-                  ),
-                  SizedBox(height: 2.h),
-                  ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    padding: EdgeInsets.symmetric(horizontal: 1.w),
-                    physics: const ScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: data.length,
-                    itemBuilder: ((context, index) {
-                      return GestureDetector(
-                              onTap: () {
-                                saveUserId(
-                                    data[index]
-                                        .userDetails
-                                        .patient
-                                        .user
-                                        .id
-                                        .toString(),
-                                    data[index].userDetails.id.toString(),
-                                    data[index]
-                                        .userDetails
-                                        .patient
-                                        .user
-                                        .id
-                                        .toString());
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        MealPlanCustomerDetailsScreen(
-                                      userName: data[index]
-                                              .userDetails
-                                              .patient
-                                              .user
-                                              .name ??
-                                          '',
-                                      age:
-                                          "${data[index].userDetails.patient.user.age ?? ""} ${data[index].userDetails.patient.user.gender ?? ""}",
-                                      appointmentDetails:
-                                          "${data[index].userDetails.appointmentDate ?? ""} / ${data[index].userDetails.appointmentTime ?? ""}",
-                                      status: buildStatusText(
-                                          data[index].userDetails.status),
-                                      finalDiagnosis:
-                                          data[index].userFinalDiagnosis ?? '',
-                                      preparatoryCurrentDay: data[index]
-                                              .userDetails
-                                              .patient
-                                              .user
-                                              .userProgram
-                                              .ppCurrentDay ??
-                                          "",
-                                      transitionCurrentDay: data[index]
-                                              .userDetails
-                                              .patient
-                                              .user
-                                              .userProgram
-                                              .tpCurrentDay ??
-                                          "",
-                                    ),
-                                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 1.h, horizontal: 3.w),
+                    child: Row(
+                      // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: searchBarTitle,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              if (searchIcon.icon == Icons.search) {
+                                searchIcon = Icon(
+                                  Icons.close,
+                                  color: gBlackColor,
+                                  size: 2.5.h,
                                 );
-                              },
-                              child: Column(
-                                children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          saveUserId(
-                                              data[index]
-                                                  .userDetails
+                                searchBarTitle = buildSearchWidget();
+                              } else {
+                                searchIcon = Icon(
+                                  Icons.search,
+                                  color: gBlackColor,
+                                  size: 2.5.h,
+                                );
+                                searchBarTitle = const Text('');
+                                // filteredNames = names;
+                                searchController.clear();
+                              }
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: gWhiteColor,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 8,
+                                  offset: const Offset(2, 3),
+                                ),
+                              ],
+                            ),
+                            child: searchIcon,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: searchController.text.isEmpty
+                          ? ListView.builder(
+                              controller: _scrollController,
+                              scrollDirection: Axis.vertical,
+                              padding: EdgeInsets.symmetric(horizontal: 1.w),
+                              physics: const ScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: mealList.length,
+                              itemBuilder: ((context, index) {
+                                var data = mealList[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NutriDelightScreen(
+                                          tabIndex: 2,
+                                          userId: int.parse(
+                                              "${data.patient?.user?.id}"),
+                                          userName:
+                                              data.patient?.user?.name ?? '',
+                                          updateTime:
+                                              data.updateTime.toString() ?? '',
+                                          updateDate:
+                                              data.updateDate.toString() ?? '',
+                                          age:
+                                              "${data.patient?.user?.age ?? ""} ${data.patient?.user?.gender ?? ""}",
+                                          appointmentDetails: buildTimeDate(
+                                              data.appointments?[0].date ?? '',
+                                              data.appointments?[0]
+                                                      .slotStartTime ??
+                                                  ''),
+                                          status: buildStatusText(
+                                              data.patient?.status ?? ''),
+                                          iconStatus:
+                                              data.patient?.status ?? '',
+                                          finalDiagnosis: '',
+                                          preparatoryCurrentDay: "",
+                                          transitionCurrentDay: "",
+                                          isPrepCompleted: data
                                                   .patient
-                                                  .user
-                                                  .id
-                                                  .toString(),
-                                              data[index]
-                                                  .userDetails
-                                                  .id
-                                                  .toString(),
-                                              data[index]
-                                                  .userDetails
-                                                  .patient
-                                                  .user
-                                                  .id
-                                                  .toString());
-                                          Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ShowProfile(),
-                                            ),
-                                          );
-                                        },
-                                        child: CircleAvatar(
-                                          radius: 3.h,
-                                          backgroundImage: NetworkImage(
-                                              data[index]
-                                                  .userDetails
-                                                  .patient
-                                                  .user
-                                                  .profile
-                                                  .toString()),
+                                                  ?.user
+                                                  ?.userProgram
+                                                  ?.isPreparatoryCompleted
+                                                  .toString() ??
+                                              '',
+                                          isProgramStatus: '',
+                                          programDayStatus: '',
                                         ),
                                       ),
-                                      SizedBox(width: 2.w),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              data[index]
-                                                  .userDetails
-                                                  .patient
-                                                  .user
-                                                  .name
-                                                  .toString(),
-                                              style:
-                                                  AllListText().headingText(),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) => ShowProfile(
+                                                      userId: int.parse(
+                                                          "${data.patient?.user?.id}")),
+                                                ),
+                                              );
+                                            },
+                                            child: CircleAvatar(
+                                              radius: 3.h,
+                                              backgroundImage: NetworkImage(
+                                                  data.patient?.user?.profile ??
+                                                      ''),
                                             ),
-                                            Text(
-                                              "${data[index].userDetails.patient.user.age.toString()} ${data[index].userDetails.patient.user.gender.toString()}",
-                                              style: AllListText()
-                                                  .subHeadingText(),
-                                            ),
-                                            Text(
-                                              "${data[index].userDetails.appointmentDate.toString()} / ${data[index].userDetails.appointmentTime.toString()}",
-                                              style: AllListText().otherText(),
-                                            ),
-                                            Row(
+                                          ),
+                                          SizedBox(width: 2.w),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  "Status : ",
-                                                  style:
-                                                      AllListText().otherText(),
+                                                  data.patient?.user?.name ??
+                                                      '',
+                                                  style: AllListText()
+                                                      .headingText(),
                                                 ),
                                                 Text(
-                                                  buildStatusText(data[index]
-                                                      .userDetails
-                                                      .status
-                                                      .toString()),
+                                                  "${data.patient?.user?.age.toString()} ${data.patient?.user?.gender.toString()}",
                                                   style: AllListText()
                                                       .subHeadingText(),
                                                 ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
                                                 Text(
-                                                  "Final Diagnosis : ",
+                                                  buildTimeDate(
+                                                      data.appointments?[0]
+                                                              .date ??
+                                                          '',
+                                                      data.appointments?[0]
+                                                              .slotStartTime ??
+                                                          ''),
                                                   style:
                                                       AllListText().otherText(),
                                                 ),
-                                                Expanded(
-                                                  child: Text(
-                                                    data[index]
-                                                        .userFinalDiagnosis
-                                                        .toString(),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: AllListText()
-                                                        .subHeadingText(),
-                                                  ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Status : ",
+                                                      style: AllListText()
+                                                          .otherText(),
+                                                    ),
+                                                    Text(
+                                                      buildStatusText(data
+                                                              .patient
+                                                              ?.status ??
+                                                          ''),
+                                                      style: AllListText()
+                                                          .subHeadingText(),
+                                                    ),
+                                                    SizedBox(width: 1.w),
+                                                    buildIconWidget(data
+                                                            .patient?.status
+                                                            .toString() ??
+                                                        ''),
+                                                  ],
                                                 ),
+                                                buildUpdatedTime(
+                                                    data.patient?.status
+                                                            .toString() ??
+                                                        '',
+                                                    data.updateDate
+                                                            .toString() ??
+                                                        '',
+                                                    data.updateTime
+                                                            .toString() ??
+                                                        ''),
+                                                // Row(
+                                                //   children: [
+                                                //     Text(
+                                                //       "Final Diagnosis : ",
+                                                //       style: AllListText().otherText(),
+                                                //     ),
+                                                //     Expanded(
+                                                //       child: Text(
+                                                //         data[index]
+                                                //             .userFinalDiagnosis
+                                                //             .toString(),
+                                                //         maxLines: 1,
+                                                //         overflow: TextOverflow.ellipsis,
+                                                //         style: AllListText()
+                                                //             .subHeadingText(),
+                                                //       ),
+                                                //     ),
+                                                //   ],
+                                                // ),
+                                                // buildPreparatoryStatus(data[index]
+                                                //
+                                                //     .patient
+                                                //     .user
+                                                //     .userProgram
+                                                //     .isPrepCompleted),
                                               ],
                                             ),
-                                            buildPreparatoryStatus(
-                                                data[index]
-                                                    .userDetails
-                                                    .patient
-                                                    .user
-                                                    .userProgram
-                                                    .isPrepCompleted),
-                                          ],
-                                        ),
+                                          ),
+                                          CallChatIcons(
+                                            userId: data.patient?.user?.id
+                                                    .toString() ??
+                                                '',
+                                            kaleyraUserId: data.patient?.user
+                                                    ?.kaleyraUserId
+                                                    .toString() ??
+                                                '',
+                                            name: data.patient?.user?.name,
+                                            email: data.patient?.user?.email,
+                                          ),
+                                          // trailIcons(callOnTap: () {
+                                          //   dialog(context);
+                                          //   saveUserId(
+                                          //       data[index]
+                                          //           .userDetails
+                                          //           .patient
+                                          //           .user
+                                          //           .id
+                                          //           .toString(),
+                                          //       data[index]
+                                          //           .userDetails
+                                          //           .id
+                                          //           .toString(),
+                                          //       data[index]
+                                          //           .userDetails
+                                          //           .patient
+                                          //           .user
+                                          //           .id
+                                          //           .toString());
+                                          // }, chatOnTap: () {
+                                          //   saveUserId(
+                                          //       data[index]
+                                          //           .userDetails
+                                          //           .patient
+                                          //           .user
+                                          //           .id
+                                          //           .toString(),
+                                          //       data[index]
+                                          //           .userDetails
+                                          //           .id
+                                          //           .toString(),
+                                          //       data[index]
+                                          //           .userDetails
+                                          //           .patient
+                                          //           .user
+                                          //           .id
+                                          //           .toString());
+                                          //   final qbService =
+                                          //       Provider.of<QuickBloxService>(
+                                          //           context,
+                                          //           listen: false);
+                                          //   qbService.openKaleyraChat(
+                                          //       kaleyraUserId,
+                                          //       data[index]
+                                          //           .kaleyraUserId
+                                          //           .toString(),
+                                          //       kaleyraAccessToken);
+                                          //   // getChatGroupId(
+                                          //   //   data[index].userDetails.patient.user.name ?? "",
+                                          //   //   data[index].userDetails.patient.user.profile.toString(),
+                                          //   //   data[index].userDetails.patient.user.id,
+                                          //   // );
+                                          // }),
+                                        ],
                                       ),
-                                      CallChatIcons(
-                                        userId: data[index]
-                                            .userDetails
-                                            .patient
-                                            .user
-                                            .id
-                                            .toString(),
-                                        kaleyraUserId: data[index]
-                                            .userDetails
-                                            .patient
-                                            .user
-                                            .kaleyraUserId
-                                            .toString(),
+                                      Container(
+                                        height: 1,
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 1.5.h),
+                                        color: Colors.grey.withOpacity(0.3),
                                       ),
-                                      // trailIcons(callOnTap: () {
-                                      //   dialog(context);
-                                      //   saveUserId(
-                                      //       data[index]
-                                      //           .userDetails
-                                      //           .patient
-                                      //           .user
-                                      //           .id
-                                      //           .toString(),
-                                      //       data[index]
-                                      //           .userDetails
-                                      //           .id
-                                      //           .toString(),
-                                      //       data[index]
-                                      //           .userDetails
-                                      //           .patient
-                                      //           .user
-                                      //           .id
-                                      //           .toString());
-                                      // }, chatOnTap: () {
-                                      //   saveUserId(
-                                      //       data[index]
-                                      //           .userDetails
-                                      //           .patient
-                                      //           .user
-                                      //           .id
-                                      //           .toString(),
-                                      //       data[index]
-                                      //           .userDetails
-                                      //           .id
-                                      //           .toString(),
-                                      //       data[index]
-                                      //           .userDetails
-                                      //           .patient
-                                      //           .user
-                                      //           .id
-                                      //           .toString());
-                                      //   final qbService =
-                                      //       Provider.of<QuickBloxService>(
-                                      //           context,
-                                      //           listen: false);
-                                      //   qbService.openKaleyraChat(
-                                      //       kaleyraUserId,
-                                      //       data[index]
-                                      //           .kaleyraUserId
-                                      //           .toString(),
-                                      //       kaleyraAccessToken);
-                                      //   // getChatGroupId(
-                                      //   //   data[index].userDetails.patient.user.name ?? "",
-                                      //   //   data[index].userDetails.patient.user.profile.toString(),
-                                      //   //   data[index].userDetails.patient.user.id,
-                                      //   // );
-                                      // }),
                                     ],
                                   ),
-                                  Container(
-                                    height: 1,
-                                    margin:
-                                        EdgeInsets.symmetric(vertical: 1.5.h),
-                                    color: Colors.grey.withOpacity(0.3),
-                                  ),
-                                ],
-                              ),
-                            );
-                    }),
+                                );
+                              }),
+                            )
+                          : buildSearchList(),
+                    ),
                   ),
                 ],
               );
-            }
-            return Padding(
-              padding: EdgeInsets.symmetric(vertical: 20.h),
-              child: buildCircularIndicator(),
+  }
+
+  Icon searchIcon = Icon(
+    Icons.search,
+    color: gBlackColor,
+    size: 2.5.h,
+  );
+  Widget searchBarTitle = const Text('');
+
+  Widget buildSearchWidget() {
+    return StatefulBuilder(builder: (_, setstate) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          color: Colors.white,
+          border:
+              Border.all(color: lightTextColor.withOpacity(0.3), width: 1.0),
+          boxShadow: [
+            BoxShadow(
+              color: lightTextColor.withOpacity(0.3),
+              blurRadius: 2,
+            ),
+          ],
+        ),
+        //padding: EdgeInsets.symmetric(horizontal: 2.w),
+        margin: EdgeInsets.symmetric(horizontal: 3.w),
+        child: TextFormField(
+          textAlignVertical: TextAlignVertical.center,
+          controller: searchController,
+          cursorColor: newBlackColor,
+          cursorHeight: 2.h,
+          textAlign: TextAlign.left,
+          decoration: InputDecoration(
+            prefixIcon: Icon(
+              Icons.search,
+              color: newBlackColor,
+              size: 2.5.h,
+            ),
+            hintText: "Search...",
+            suffixIcon: searchController.text.isNotEmpty
+                ? GestureDetector(
+                    child: Icon(Icons.close_outlined,
+                        size: 2.h, color: newBlackColor),
+                    onTap: () {
+                      searchController.clear();
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  )
+                : null,
+            hintStyle: LoginScreen().hintTextField(),
+            border: InputBorder.none,
+          ),
+          style: LoginScreen().mainTextField(),
+          onChanged: (value) {
+            onSearchTextChanged(value);
+          },
+        ),
+      );
+    });
+  }
+
+  onSearchTextChanged(String text) async {
+    searchResults.clear();
+    if (text.isEmpty) {
+      setState(() {});
+      return;
+    }
+    mealActiveModel?.mealPlanList?.forEach((userDetail) {
+      if (userDetail.patient!.user!.name!
+          .toLowerCase()
+          .contains(text.toLowerCase())) {
+        searchResults.add(userDetail);
+      }
+    });
+    print("searchResults : $searchResults");
+    setState(() {});
+  }
+
+  buildSearchList() {
+    return ListView.builder(
+      controller: _scrollController,
+      scrollDirection: Axis.vertical,
+      padding: EdgeInsets.symmetric(horizontal: 1.w),
+      physics: const ScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: searchResults.length,
+      itemBuilder: ((context, index) {
+        var data = searchResults[index];
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => NutriDelightScreen(
+                  tabIndex: 2,
+                  userId: int.parse("${data.patient?.user?.id}"),
+                  userName: data.patient?.user?.name ?? '',
+                  updateTime: data.updateTime.toString() ?? '',
+                  updateDate: data.updateDate.toString() ?? '',
+                  age:
+                      "${data.patient?.user?.age ?? ""} ${data.patient?.user?.gender ?? ""}",
+                  appointmentDetails: buildTimeDate(
+                      data.appointments?[0].date ?? '',
+                      data.appointments?[0].slotStartTime ?? ''),
+                  status: buildStatusText(data.status ?? ''),
+                  finalDiagnosis: '',
+                  preparatoryCurrentDay: "",
+                  transitionCurrentDay: "",
+                  isPrepCompleted: data
+                          .patient?.user?.userProgram?.isPreparatoryCompleted
+                          .toString() ??
+                      '',
+                  isProgramStatus: '',
+                  programDayStatus: '',
+                ),
+              ),
             );
-          }),
+          },
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ShowProfile(
+                              userId: int.parse("${data.patient?.user?.id}")),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 3.h,
+                      backgroundImage:
+                          NetworkImage(data.patient?.user?.profile ?? ''),
+                    ),
+                  ),
+                  SizedBox(width: 2.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          data.patient?.user?.name ?? '',
+                          style: AllListText().headingText(),
+                        ),
+                        Text(
+                          "${data.patient?.user?.age.toString()} ${data.patient?.user?.gender.toString()}",
+                          style: AllListText().subHeadingText(),
+                        ),
+                        Text(
+                          buildTimeDate(data.appointments?[0].date ?? '',
+                              data.appointments?[0].slotStartTime ?? ''),
+                          style: AllListText().otherText(),
+                        ),
+                        Row(crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Status : ",
+                              style: AllListText().otherText(),
+                            ),
+                            Text(
+                              buildStatusText(data.patient?.status ?? ''),
+                              style: AllListText().subHeadingText(),
+                            ),
+                          ],
+                        ),
+                        // Row(
+                        //   children: [
+                        //     Text(
+                        //       "Final Diagnosis : ",
+                        //       style: AllListText().otherText(),
+                        //     ),
+                        //     Expanded(
+                        //       child: Text(
+                        //         data[index]
+                        //             .userFinalDiagnosis
+                        //             .toString(),
+                        //         maxLines: 1,
+                        //         overflow: TextOverflow.ellipsis,
+                        //         style: AllListText()
+                        //             .subHeadingText(),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
+                        // buildPreparatoryStatus(data[index]
+                        //
+                        //     .patient
+                        //     .user
+                        //     .userProgram
+                        //     .isPrepCompleted),
+                      ],
+                    ),
+                  ),
+                  CallChatIcons(
+                    userId: data.patient?.user?.id.toString() ?? '',
+                    kaleyraUserId:
+                        data.patient?.user?.kaleyraUserId.toString() ?? '',
+                    name: data.patient?.user?.name,
+                    email: data.patient?.user?.email,
+                  ),
+                  // trailIcons(callOnTap: () {
+                  //   dialog(context);
+                  //   saveUserId(
+                  //       data[index]
+                  //           .userDetails
+                  //           .patient
+                  //           .user
+                  //           .id
+                  //           .toString(),
+                  //       data[index]
+                  //           .userDetails
+                  //           .id
+                  //           .toString(),
+                  //       data[index]
+                  //           .userDetails
+                  //           .patient
+                  //           .user
+                  //           .id
+                  //           .toString());
+                  // }, chatOnTap: () {
+                  //   saveUserId(
+                  //       data[index]
+                  //           .userDetails
+                  //           .patient
+                  //           .user
+                  //           .id
+                  //           .toString(),
+                  //       data[index]
+                  //           .userDetails
+                  //           .id
+                  //           .toString(),
+                  //       data[index]
+                  //           .userDetails
+                  //           .patient
+                  //           .user
+                  //           .id
+                  //           .toString());
+                  //   final qbService =
+                  //       Provider.of<QuickBloxService>(
+                  //           context,
+                  //           listen: false);
+                  //   qbService.openKaleyraChat(
+                  //       kaleyraUserId,
+                  //       data[index]
+                  //           .kaleyraUserId
+                  //           .toString(),
+                  //       kaleyraAccessToken);
+                  //   // getChatGroupId(
+                  //   //   data[index].userDetails.patient.user.name ?? "",
+                  //   //   data[index].userDetails.patient.user.profile.toString(),
+                  //   //   data[index].userDetails.patient.user.id,
+                  //   // );
+                  // }),
+                ],
+              ),
+              Container(
+                height: 1,
+                margin: EdgeInsets.symmetric(vertical: 1.5.h),
+                color: Colors.grey.withOpacity(0.3),
+
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 
-  saveUserId(String patientId, String teamPatientId, String userId) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setString("patient_id", patientId);
-    preferences.setString("team_patient_id", teamPatientId);
-    preferences.setString("user_id", userId);
-  }
+  final CustomerStatusRepo repository = CustomerStatusRepo(
+    apiClient: ApiClient(
+      httpClient: http.Client(),
+    ),
+  );
 
   String buildStatusText(String status) {
     if (status == "report_upload") {
@@ -327,34 +667,41 @@ class _MealPlanListScreenState extends State<MealPlanListScreen> {
     } else if (status == "check_user_reports") {
       return "Check User Reports";
     } else if (status == "meal_plan_completed") {
-      return "Meal Plan Completed";
+      return "Meal Plan Completed\n(Shipment Awaited)";
     } else if (status == "shipping_paused") {
-      return "Shipping Paused";
+      return "Shipment Paused";
     } else if (status == "shipping_packed") {
-      return "Shipping Packed";
+      return "Shipment Packed";
     } else if (status == "shipping_approved") {
-      return "Shipping Approved";
+      return "Shipment Approved";
     } else if (status == "shipping_delivered") {
-      return "Shipping Delivered";
+      return "Shipment Delivered";
     } else if (status == "prep_meal_plan_completed") {
-      return "Preparatory Meal Plan Completed";
+      return "Meal Plan Pending";
     }
     return statusText;
   }
 
-  buildPreparatoryStatus(String isPrepCompleted) {
-    return (isPrepCompleted == "1") &&
-        (isPrepCompleted != "null")
-        ? Text(
-      "Preparatory Plan Completed by user",
-      style: TextStyle(
-          height: 1.3,
-          fontFamily: fontMedium,
-          color: gSecondaryColor,
-          fontSize: fontSize08),
-    )
-        : const SizedBox();
-  }
+// buildPreparatoryStatus(String isPrepCompleted) {
+  //   return (isPrepCompleted == "1")
+  //       // && (isPrepCompleted != "null")
+  //       ? Text(
+  //           "Preparatory Plan Completed by user",
+  //           style: TextStyle(
+  //               height: 1.3,
+  //               fontFamily: fontMedium,
+  //               color: gSecondaryColor,
+  //               fontSize: fontSize08),
+  //         )
+  //       : Text(
+  //     "Preparatory Program Running",
+  //     style: TextStyle(
+  //         height: 1.3,
+  //         fontFamily: fontMedium,
+  //         color: gPrimaryColor,
+  //         fontSize: fontSize08),
+  //   );
+  // }
   //
   // final MessageRepository chatRepository = MessageRepository(
   //   apiClient: ApiClient(

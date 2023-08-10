@@ -1,5 +1,5 @@
 
-import '../../controller/api_service.dart';
+import '../../service/api_service.dart';
 
 class SuccessMemberProfileRepository{
   ApiClient apiClient;

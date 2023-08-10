@@ -14,12 +14,15 @@ class PreparatoryMealPlan extends StatefulWidget {
   final String preparatoryCurrentDay;
   final String ppCurrentDay;
   final String presDay;
-  const PreparatoryMealPlan(
-      {Key? key,
-        required this.preparatoryCurrentDay,
-        required this.ppCurrentDay,
-        required this.presDay})
-      : super(key: key);
+  final String isPrepCompleted;
+
+  const PreparatoryMealPlan({
+    Key? key,
+    required this.preparatoryCurrentDay,
+    required this.ppCurrentDay,
+    required this.presDay,
+    required this.isPrepCompleted,
+  }) : super(key: key);
 
   @override
   State<PreparatoryMealPlan> createState() => _PreparatoryMealPlanState();
@@ -113,128 +116,142 @@ class _PreparatoryMealPlanState extends State<PreparatoryMealPlan> {
         ),
         showLoading
             ? Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.h),
-            child: buildCircularIndicator(),
-          ),
-        )
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                  child: buildCircularIndicator(),
+                ),
+              )
             : Expanded(
-          child: SingleChildScrollView(
-            child: StatefulBuilder(builder: (_, setstate) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 1.h),
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(children: [
-                      TextSpan(
-                        text:
-                        "${preparatoryTransitionModel?.days ?? " "} ",
-                        style: MealPlan().headingText(),
-                      ),
-                      TextSpan(
-                        text: "Days preparatory",
-                        style: MealPlan().subHeadingText(),
-                      ),
-                    ]),
-                  ),
-                  SizedBox(height: 1.h),
-                  (widget.presDay == widget.ppCurrentDay &&
-                      (widget.presDay.isNotEmpty) &&
-                      widget.ppCurrentDay.isNotEmpty)
-                      ? Text(
-                    "Preparatory Plan Completed by user",
-                    style: TextStyle(
-                        fontFamily: fontMedium,
-                        color: gSecondaryColor,
-                        fontSize: fontSize08),
-                  )
-                      : const SizedBox(),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 25.w, vertical: 2.h),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () {
-                            if (selectedIndex == 0) {
-                            } else {
-                              setstate(() {
-                                if (selectedIndex > 0) {
-                                  selectedIndex--;
-                                }
-                                updateTabSize();
-                                print(selectedIndex);
-                              });
-                            }
-                          },
-                          child: Icon(
-                            Icons.arrow_back_ios,
-                            color: gBlackColor,
-                            size: 2.5.h,
+                child: SingleChildScrollView(
+                  child: StatefulBuilder(builder: (_, setstate) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 1.h),
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(children: [
+                            TextSpan(
+                              text:
+                                  "${preparatoryTransitionModel?.days ?? " "} ",
+                              style: MealPlan().headingText(),
+                            ),
+                            TextSpan(
+                              text: "Days preparatory",
+                              style: MealPlan().subHeadingText(),
+                            ),
+                          ]),
+                        ),
+                        buildPreparatoryStatus(widget.isPrepCompleted),
+                        // SizedBox(height: 1.h),
+                        // (widget.presDay == widget.ppCurrentDay &&
+                        //     (widget.presDay.isNotEmpty) &&
+                        //     widget.ppCurrentDay.isNotEmpty)
+                        //     ? Text(
+                        //   "Preparatory Plan Completed by user",
+                        //   style: TextStyle(
+                        //       fontFamily: fontMedium,
+                        //       color: gSecondaryColor,
+                        //       fontSize: fontSize08),
+                        // )
+                        //     : const SizedBox(),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 25.w, vertical: 2.h),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  if (selectedIndex == 0) {
+                                  } else {
+                                    setstate(() {
+                                      if (selectedIndex > 0) {
+                                        selectedIndex--;
+                                      }
+                                      updateTabSize();
+                                      print(selectedIndex);
+                                    });
+                                  }
+                                },
+                                child: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: gBlackColor,
+                                  size: 2.5.h,
+                                ),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  list[selectedIndex],
+                                  style: MealPlan().tabText(),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setstate(() {
+                                    if (selectedIndex == list.length - 1) {
+                                    } else {
+                                      if (selectedIndex >= 0 &&
+                                          selectedIndex != list.length - 1) {
+                                        selectedIndex++;
+                                      }
+                                      print(selectedIndex);
+                                      updateTabSize();
+                                      print(selectedIndex);
+                                    }
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: gBlackColor,
+                                  size: 2.5.h,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        FittedBox(
-                          child: Text(
-                            list[selectedIndex],
-                            style: MealPlan().tabText(),
-                          ),
-                        ),
+                        buildPreparatoryMealPlan(),
                         GestureDetector(
                           onTap: () {
-                            setstate(() {
-                              if (selectedIndex == list.length - 1) {
-                              } else {
-                                if (selectedIndex >= 0 &&
-                                    selectedIndex != list.length - 1) {
-                                  selectedIndex++;
-                                }
-                                print(selectedIndex);
-                                updateTabSize();
-                                print(selectedIndex);
-                              }
-                            });
+                            buildPreparatory(
+                                "${preparatoryTransitionModel?.days}", context);
                           },
-                          child: Icon(
-                            Icons.arrow_forward_ios,
-                            color: gBlackColor,
-                            size: 2.5.h,
+                          child: Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 20.w, vertical: 5.h),
+                            padding: EdgeInsets.symmetric(vertical: 1.2.h),
+                            decoration: BoxDecoration(
+                              color: gSecondaryColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Preparatory Status',
+                                style: LoginScreen().buttonText(whiteTextColor),
+                              ),
+                            ),
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                  buildPreparatoryMealPlan(),
-                  GestureDetector(
-                    onTap: () {
-                      buildPreparatory(
-                          "${preparatoryTransitionModel?.days}", context);
-                    },
-                    child: Container(
-                      margin: EdgeInsets.symmetric(
-                          horizontal: 20.w, vertical: 5.h),
-                      padding: EdgeInsets.symmetric(vertical: 1.2.h),
-                      decoration: BoxDecoration(
-                        color: gSecondaryColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Preparatory Status',
-                          style: LoginScreen().buttonText(whiteTextColor),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }),
-          ),
-        ),
+                    );
+                  }),
+                ),
+              ),
       ],
     );
+  }
+
+  buildPreparatoryStatus(String isPrepCompleted) {
+    return (isPrepCompleted == "1") && (isPrepCompleted != "null")
+        ? Text(
+            "Preparatory Plan Completed by user",
+            style: TextStyle(
+                height: 1.3,
+                fontFamily: fontMedium,
+                color: gSecondaryColor,
+                fontSize: fontSize08),
+          )
+        : const SizedBox();
   }
 
   buildPreparatoryMealPlan() {
@@ -277,19 +294,19 @@ class _PreparatoryMealPlanState extends State<PreparatoryMealPlan> {
                               borderRadius: BorderRadius.circular(15),
                               child: (lst[index].itemPhoto == null)
                                   ? Image.asset(
-                                'assets/images/meal_placeholder.png',
-                                fit: BoxFit.fill,
-                              )
+                                      'assets/images/meal_placeholder.png',
+                                      fit: BoxFit.fill,
+                                    )
                                   : Image.network(
-                                lst[index].itemPhoto ?? '',
-                                errorBuilder: (_, widget, child) {
-                                  return Image.asset(
-                                    'assets/images/meal_placeholder.png',
-                                    fit: BoxFit.fill,
-                                  );
-                                },
-                                fit: BoxFit.fill,
-                              ),
+                                      lst[index].itemPhoto ?? '',
+                                      errorBuilder: (_, widget, child) {
+                                        return Image.asset(
+                                          'assets/images/meal_placeholder.png',
+                                          fit: BoxFit.fill,
+                                        );
+                                      },
+                                      fit: BoxFit.fill,
+                                    ),
                             ),
                           ),
                           SizedBox(width: 1.w),
@@ -303,7 +320,7 @@ class _PreparatoryMealPlanState extends State<PreparatoryMealPlan> {
                                   SizedBox(height: 0.5.h),
                                   RichText(
                                     textScaleFactor:
-                                    MediaQuery.of(context).textScaleFactor,
+                                        MediaQuery.of(context).textScaleFactor,
                                     text: TextSpan(
                                         text: lst[index].name,
                                         style: MealPlan().headingText(),
@@ -319,50 +336,50 @@ class _PreparatoryMealPlanState extends State<PreparatoryMealPlan> {
                                   SizedBox(height: 0.5.h),
                                   (lst[index].benefits != null)
                                       ? Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5.0),
-                                      child: SingleChildScrollView(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ...lst[index]
-                                                .benefits!
-                                                .split(' -')
-                                                .map((element) {
-                                              return Row(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 5.0),
+                                            child: SingleChildScrollView(
+                                              child: Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment
-                                                    .center,
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  Center(
-                                                    child: Icon(
-                                                      Icons.circle_sharp,
-                                                      color: gGreyColor,
-                                                      size: 1.h,
-                                                    ),
-                                                  ),
-                                                  SizedBox(width: 1.w),
-                                                  Expanded(
-                                                    child: Text(
-                                                      element.replaceAll(
-                                                          "-", ""),
-                                                      textAlign:
-                                                      TextAlign.start,
-                                                      style: MealPlan()
-                                                          .subHeadingText(),
-                                                    ),
-                                                  ),
+                                                  ...lst[index]
+                                                      .benefits!
+                                                      .split(' -')
+                                                      .map((element) {
+                                                    return Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Center(
+                                                          child: Icon(
+                                                            Icons.circle_sharp,
+                                                            color: gGreyColor,
+                                                            size: 1.h,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 1.w),
+                                                        Expanded(
+                                                          child: Text(
+                                                            element.replaceAll(
+                                                                "-", ""),
+                                                            textAlign:
+                                                                TextAlign.start,
+                                                            style: MealPlan()
+                                                                .subHeadingText(),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  })
                                                 ],
-                                              );
-                                            })
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
+                                              ),
+                                            ),
+                                          ),
+                                        )
                                       : const SizedBox(),
                                   SizedBox(height: 0.5.h),
                                 ],
@@ -418,7 +435,7 @@ class _PreparatoryMealPlanState extends State<PreparatoryMealPlan> {
       barrierDismissible: false,
       context: context,
       builder: (context) => PreparatoryAnswerScreen(
-        days: days,
+        days: days, userId:0,
       ),
     );
   }

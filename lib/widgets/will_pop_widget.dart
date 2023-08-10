@@ -6,7 +6,7 @@ import '../utils/constants.dart';
 
 class WillPopWidget extends StatefulWidget {
   final Widget? child;
-  const WillPopWidget({Key? key, this.child}) : super(key: key);
+  const WillPopWidget({Key? key, this.child, required Future<bool> Function() onWillPop}) : super(key: key);
 
   @override
   _WillPopWidgetState createState() => _WillPopWidgetState();

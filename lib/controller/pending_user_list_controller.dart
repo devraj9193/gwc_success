@@ -27,7 +27,6 @@ class PendingUserListController extends GetxController {
     if (response.statusCode == 200) {
       PendingUserList jsonData = pendingUserListFromJson(response.body);
       List<Pending>? arrData = jsonData.data?.pending;
-      print("status: ${arrData?[0].status}");
       return arrData;
     } else {
       throw Exception();

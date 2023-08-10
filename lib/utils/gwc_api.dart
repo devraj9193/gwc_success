@@ -77,6 +77,63 @@ class GwcApi {
   static String transitionAnswerApiUrl =
       "$baseUrl/api/getDataList/trans_meal_tracking_data";
 
+
+  static String unClaimedCustomerListApiUrl =
+      "$baseUrl/api/getDataValue/not_claimed_customer";
+
+  static String claimedCustomerListApiUrl =
+      "$baseUrl/api/getDataValue/claimed_customers";
+
+  static String claimCustomerApiUrl =
+      "$baseUrl/api/getDataValue/claim_customer";
+
+  static String nutriDelightApiUrl =
+      "$baseUrl/api/getData/NutriDelight";
+
+  // selected day, user id, detox = 1, healing = 2 need to pass
+  static String dailyProgressMealPlanApiUrl =
+      "$baseUrl/api/getDataList/user_day_meal_plan";
+
+  static String allDayTrackerApiUrl =
+      "$baseUrl/api/getData/NutriDelightTracker";
+
+  static String getDoctorDetailsApiUrl = "$baseUrl/api/getDataValue/get_doctor_details";
+
+  // SHIP ROCKET
+  static String shipRocketLoginApiUrl =
+      "https://apiv2.shiprocket.in/v1/external/auth/login";
+
+  static String shippingTrackingApiUrl =
+      "https://apiv2.shiprocket.in/v1/external/courier/track/awb";
+
+  // Kaleyra Chat List
+  static String KaleyraChatListApiUrl = "https://api.in.bandyer.com/rest/user/GWC_Success/chat/list";
+
+  //uvDesk Urls
+  static String uvDeskTicketRaiseApiUrl = "$uvBaseUrl/ticket";
+  // static String uvDeskTicketRaiseApiUrl =  "https://fembuddy.uvdesk.com/en/api/tickets.json";
+
+  static String allTicketListApiUrl = "$uvBaseUrl/tickets?status=1|2|3|4|5|6";
+  // "https://fembuddy.uvdesk.com/en/api/tickets.json?status=1|2|3|4|5|6";
+
+  static String threadsApiUrl = "$uvBaseUrl/ticket";
+
+  static String openListApiUrl = "$uvBaseUrl/tickets?status=1&agent=";
+
+  static String answeredListApiUrl = "$uvBaseUrl/tickets?status=3&agent=";
+
+  static String resolvedListApiUrl = "$uvBaseUrl/tickets?status=4&agent=";
+
+  static String closedListApiUrl = "$uvBaseUrl/tickets?status=5&agent=";
+
+  static String sendClosedResolvedApiUrl = "$uvBaseUrl/ticket";
+
+  static String sendTransferToDoctorApiUrl = "$uvBaseUrl/ticket";
+
+  static String groupOfListApiUrl = "$uvBaseUrl/groups?search=";
+
+
+  static const String isLogin = "login";
   static const String groupId = '635fa22932eaaf0030c5ef1e';
   static const String doctorGroupId = '635fa22932eaaf0030c5ef1e';
   static const String qbCurrentUserId = 'curr_userId';
@@ -95,7 +152,10 @@ class GwcApi {
   static String successMemberProfile = "successMemberProfile";
   static String successMemberAddress = "successMemberAddress";
 
+  static String shipRocketEmail = "disoltech22@gmail.com";
+  static String shipRocketPassword = "adithya7224";
 
+      // "HBTCAEHAAAOTTVECVMNJGLWYVXVN3GBJUR0XVZNOJTO4N1Y4LD7LT3LE4PVONODF";
 
   static SharedPreferences? preferences;
   static Future<String?> getDeviceId() async {
@@ -116,3 +176,6 @@ class GwcApi {
     );
   }
 }
+
+
+// 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

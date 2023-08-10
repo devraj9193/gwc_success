@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../model/maintenance_guide_model.dart';
-import '../utils/gwc_api.dart';
+import '../utils/success_api_urls.dart';
 
 class MaintenanceGuideController extends GetxController {
   MaintenanceGuideModel? maintenanceGuideModel;
@@ -19,7 +19,7 @@ class MaintenanceGuideController extends GetxController {
     var token = preferences.getString("token")!;
 
     final response =
-        await http.get(Uri.parse(GwcApi.maintenanceGuideUrl), headers: {
+        await http.get(Uri.parse(SuccessApiUrls.successPostProgramList), headers: {
       'Authorization': 'Bearer $token',
     });
     if (response.statusCode == 200) {
@@ -39,7 +39,7 @@ class MaintenanceGuideController extends GetxController {
     var token = preferences.getString("token")!;
 
     final response =
-        await http.get(Uri.parse(GwcApi.maintenanceGuideUrl), headers: {
+        await http.get(Uri.parse(SuccessApiUrls.successPostProgramList), headers: {
       'Authorization': 'Bearer $token',
     });
     if (response.statusCode == 200) {

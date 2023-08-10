@@ -37,32 +37,37 @@ class PendingUserList {
 
 class Data {
   Data({
-    this.pending,
-    this.paused,
-    this.packed,
+    required this.pending,
+    required this.paused,
+    required this.packed,
+    required this.delivered,
     //this.approved,
   });
 
-  List<Pending>? pending;
-  List<Pending>? paused;
-  List<Approved>? packed;
- // List<Approved>? approved;
+  List<Pending> pending;
+  List<Pending> paused;
+  List<Approved> packed;
+  List<Approved> delivered;
+  // List<Approved>? approved;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-        pending: List<Pending>.from(
-            json["pending"].map((x) => Pending.fromJson(x))),
+        pending:
+            List<Pending>.from(json["pending"].map((x) => Pending.fromJson(x))),
         paused:
             List<Pending>.from(json["paused"].map((x) => Pending.fromJson(x))),
-        packed:
-            List<Approved>.from(json["packed"].map((x) => Approved.fromJson(x))),
+        packed: List<Approved>.from(
+            json["packed"].map((x) => Approved.fromJson(x))),
+        delivered: List<Approved>.from(
+            json["delivered"].map((x) => Approved.fromJson(x))),
         // approved: List<Approved>.from(
         //     json["approved"].map((x) => Approved.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "pending": List<dynamic>.from(pending!.map((x) => x.toJson())),
-        "paused": List<dynamic>.from(paused!.map((x) => x.toJson())),
-        "packed": List<dynamic>.from(packed!.map((x) => x.toJson())),
+        "pending": List<dynamic>.from(pending.map((x) => x.toJson())),
+        "paused": List<dynamic>.from(paused.map((x) => x.toJson())),
+        "packed": List<dynamic>.from(packed.map((x) => x.toJson())),
+        "delivered": List<dynamic>.from(delivered.map((x) => x.toJson())),
         //"approved": List<dynamic>.from(approved!.map((x) => x.toJson())),
       };
 }
@@ -112,21 +117,21 @@ class Approved {
 
   factory Approved.fromJson(Map<String, dynamic> json) => Approved(
         id: json["id"],
-        teamId: json["team_id"],
-        patientId: json["patient_id"],
-        programId: json["program_id"],
-        assignedDate: json["assigned_date"],
-        uploadTime: json["upload_time"],
-        status: json["status"],
-        isArchieved: json["is_archieved"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
-        appointmentDate: json["appointment_date"],
-        appointmentTime: json["appointment_time"],
-        updateDate: json["update_date"],
-        updateTime: json["update_time"],
-        manifestUrl: json["manifest_url"],
-        labelUrl: json["label_url"],
+        teamId: json["team_id"].toString(),
+        patientId: json["patient_id"].toString(),
+        programId: json["program_id"].toString(),
+        assignedDate: json["assigned_date"].toString(),
+        uploadTime: json["upload_time"].toString(),
+        status: json["status"].toString(),
+        isArchieved: json["is_archieved"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
+        appointmentDate: json["appointment_date"].toString(),
+        appointmentTime: json["appointment_time"].toString(),
+        updateDate: json["update_date"].toString(),
+        updateTime: json["update_time"].toString(),
+        manifestUrl: json["manifest_url"].toString(),
+        labelUrl: json["label_url"].toString(),
         patient: Patient.fromJson(json["patient"]),
         appointments: List<Appointment>.from(
             json["appointments"].map((x) => Appointment.fromJson(x))),
@@ -194,20 +199,20 @@ class Appointment {
 
   factory Appointment.fromJson(Map<String, dynamic> json) => Appointment(
         id: json["id"],
-        teamPatientId: json["team_patient_id"],
-        date: json["date"],
-        slotStartTime: json["slot_start_time"],
-        slotEndTime: json["slot_end_time"],
-        type: json["type"],
-        status: json["status"],
-        zoomJoinUrl: json["zoom_join_url"],
-        zoomStartUrl: json["zoom_start_url"],
-        zoomId: json["zoom_id"],
-        zoomPassword: json["zoom_password"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
-        appointmentDate: json["appointment_date"],
-        appointmentStartTime: json["appointment_start_time"],
+        teamPatientId: json["team_patient_id"].toString(),
+        date: json["date"].toString(),
+        slotStartTime: json["slot_start_time"].toString(),
+        slotEndTime: json["slot_end_time"].toString(),
+        type: json["type"].toString(),
+        status: json["status"].toString(),
+        zoomJoinUrl: json["zoom_join_url"].toString(),
+        zoomStartUrl: json["zoom_start_url"].toString(),
+        zoomId: json["zoom_id"].toString(),
+        zoomPassword: json["zoom_password"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
+        appointmentDate: json["appointment_date"].toString(),
+        appointmentStartTime: json["appointment_start_time"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -270,22 +275,22 @@ class Order {
 
   factory Order.fromJson(Map<String, dynamic> json) => Order(
         id: json["id"],
-        teamPatientId: json["team_patient_id"],
-        orderId: json["order_id"],
-        shippingId: json["shipping_id"],
-        awbCode: json["awb_code"],
-        courierName: json["courier_name"],
-        courierCompanyId: json["courier_company_id"],
-        assignedDateTime: json["assigned_date_time"],
-        labelUrl: json["label_url"],
-        manifestUrl: json["manifest_url"],
-        pickupTokenNumber: json["pickup_token_number"],
-        routingCode: json["routing_code"],
-        pickupScheduledDate: json["pickup_scheduled_date"],
-        status: json["status"],
-        addedBy: json["added_by"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
+        teamPatientId: json["team_patient_id"].toString(),
+        orderId: json["order_id"].toString(),
+        shippingId: json["shipping_id"].toString(),
+        awbCode: json["awb_code"].toString(),
+        courierName: json["courier_name"].toString(),
+        courierCompanyId: json["courier_company_id"].toString(),
+        assignedDateTime: json["assigned_date_time"].toString(),
+        labelUrl: json["label_url"].toString(),
+        manifestUrl: json["manifest_url"].toString(),
+        pickupTokenNumber: json["pickup_token_number"].toString(),
+        routingCode: json["routing_code"].toString(),
+        pickupScheduledDate: json["pickup_scheduled_date"].toString(),
+        status: json["status"].toString(),
+        addedBy: json["added_by"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -320,6 +325,7 @@ class Patient {
     this.country,
     this.weight,
     this.status,
+    this.shippingDeliveryDate,
     this.isArchieved,
     this.createdAt,
     this.updatedAt,
@@ -335,6 +341,7 @@ class Patient {
   String? country;
   String? weight;
   String? status;
+  String? shippingDeliveryDate;
   String? isArchieved;
   String? createdAt;
   String? updatedAt;
@@ -342,17 +349,18 @@ class Patient {
 
   factory Patient.fromJson(Map<String, dynamic> json) => Patient(
         id: json["id"],
-        userId: json["user_id"],
-        maritalStatus: json["marital_status"],
-        address2: json["address2"],
-        city: json["city"],
-        state: json["state"],
-        country: json["country"],
-        weight: json["weight"],
-        status: json["status"],
-        isArchieved: json["is_archieved"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
+        userId: json["user_id"].toString(),
+        maritalStatus: json["marital_status"].toString(),
+        address2: json["address2"].toString(),
+        city: json["city"].toString(),
+        state: json["state"].toString(),
+        country: json["country"].toString(),
+        weight: json["weight"].toString(),
+        status: json["status"].toString(),
+        shippingDeliveryDate: json["shipping_delivery_date"].toString(),
+        isArchieved: json["is_archieved"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
         user: User.fromJson(json["user"]),
       );
 
@@ -366,6 +374,7 @@ class Patient {
         "country": country,
         "weight": weight,
         "status": status,
+        "shipping_delivery_date": shippingDeliveryDate,
         "is_archieved": isArchieved,
         "created_at": createdAt,
         "updated_at": updatedAt,
@@ -383,6 +392,7 @@ class User {
     this.email,
     this.emailVerifiedAt,
     this.countryCode,
+    this.kaleyraUserId,
     this.phone,
     this.gender,
     this.profile,
@@ -408,6 +418,7 @@ class User {
   String? email;
   String? emailVerifiedAt;
   String? countryCode;
+  String? kaleyraUserId;
   String? phone;
   String? gender;
   String? profile;
@@ -426,28 +437,29 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         id: json["id"],
-        roleId: json["role_id"],
-        name: json["name"],
-        fname: json["fname"],
-        lname: json["lname"],
-        email: json["email"],
-        emailVerifiedAt: json["email_verified_at"],
+        roleId: json["role_id"].toString(),
+        name: json["name"].toString(),
+        fname: json["fname"].toString(),
+        lname: json["lname"].toString(),
+        email: json["email"].toString(),
+        emailVerifiedAt: json["email_verified_at"].toString().toString(),
         countryCode: json["country_code"],
-        phone: json["phone"],
-        gender: json["gender"],
-        profile: json["profile"],
-        address: json["address"],
-        otp: json["otp"],
-        deviceToken: json["device_token"],
-        deviceType: json["device_type"],
-        deviceId: json["device_id"],
-        age: json["age"],
-        pincode: json["pincode"],
-        isActive: json["is_active"],
-        addedBy: json["added_by"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
-        signupDate: json["signup_date"],
+        phone: json["phone"].toString().toString(),
+        gender: json["gender"].toString(),
+        profile: json["profile"].toString(),
+        address: json["address"].toString(),
+        otp: json["otp"].toString(),
+        deviceToken: json["device_token"].toString(),
+        kaleyraUserId: json["kaleyra_user_id"].toString(),
+        deviceType: json["device_type"].toString(),
+        deviceId: json["device_id"].toString(),
+        age: json["age"].toString(),
+        pincode: json["pincode"].toString(),
+        isActive: json["is_active"].toString(),
+        addedBy: json["added_by"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
+        signupDate: json["signup_date"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -465,6 +477,7 @@ class User {
         "address": address,
         "otp": otp,
         "device_token": deviceToken,
+        "kaleyra_user_id": kaleyraUserId,
         "device_type": deviceType,
         "device_id": deviceId,
         "age": age,
@@ -520,21 +533,21 @@ class Pending {
 
   factory Pending.fromJson(Map<String, dynamic> json) => Pending(
         id: json["id"],
-        teamId: json["team_id"],
-        patientId: json["patient_id"],
-        programId: json["program_id"],
-        assignedDate: json["assigned_date"],
-        uploadTime: json["upload_time"],
-        status: json["status"],
-        isArchieved: json["is_archieved"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
-        appointmentDate: json["appointment_date"],
-        appointmentTime: json["appointment_time"],
-        updateDate: json["update_date"],
-        updateTime: json["update_time"],
-        manifestUrl: json["manifest_url"],
-        labelUrl: json["label_url"],
+        teamId: json["team_id"].toString(),
+        patientId: json["patient_id"].toString(),
+        programId: json["program_id"].toString(),
+        assignedDate: json["assigned_date"].toString(),
+        uploadTime: json["upload_time"].toString(),
+        status: json["status"].toString(),
+        isArchieved: json["is_archieved"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
+        appointmentDate: json["appointment_date"].toString(),
+        appointmentTime: json["appointment_time"].toString(),
+        updateDate: json["update_date"].toString(),
+        updateTime: json["update_time"].toString(),
+        manifestUrl: json["manifest_url"].toString().toString(),
+        labelUrl: json["label_url"].toString(),
         patient: Patient.fromJson(json["patient"]),
         appointments: List<Appointment>.from(
             json["appointments"].map((x) => Appointment.fromJson(x))),

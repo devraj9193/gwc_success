@@ -5,31 +5,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
-import '../../model/chat_support/chat_support_method.dart';
 import '../../model/customer_call_model.dart';
-import '../../model/error_model.dart';
 import '../../utils/constants.dart';
 import '../../utils/gwc_api.dart';
 import '../../widgets/common_screen_widgets.dart';
+import '../ticket_raise_screens/raise_a_ticket.dart';
 
 class CallChatIcons extends StatefulWidget {
   final String userId;
   final String kaleyraUserId;
+  final String? name;
+  final String? email;
   final bool chat;
-  const CallChatIcons(
-      {Key? key,
-      required this.userId,
-      required this.kaleyraUserId,
-      this.chat = false})
-      : super(key: key);
+  const CallChatIcons({
+    Key? key,
+    required this.userId,
+    required this.kaleyraUserId,
+    this.chat = false,
+    this.name,
+    this.email,
+  }) : super(key: key);
 
   @override
   State<CallChatIcons> createState() => _CallChatIconsState();
 }
 
 class _CallChatIconsState extends State<CallChatIcons> {
-  final SharedPreferences _pref = GwcApi.preferences!;
   CustomerCallModel? customerCallModel;
 
   @override
@@ -56,35 +57,58 @@ class _CallChatIconsState extends State<CallChatIcons> {
         widget.chat
             ? const SizedBox()
             : GestureDetector(
-                onTap: () async {
-                  final kaleyraUserId = _pref.getString("kaleyraUserId");
-                  final res = await getKaleyraAccessToken(kaleyraUserId!);
-
-                  if (res.runtimeType != ErrorModel) {
-                    final accessToken =
-                        _pref.getString(GwcApi.kaleyraAccessToken);
-
-                    // chat
-                    openKaleyraChat(kaleyraUserId,
-                        widget.kaleyraUserId.toString(), accessToken!);
-                  } else {
-                    final result = res as ErrorModel;
-                    print("get Access Token error: ${result.message}");
-                    GwcApi().showSnackBar(context, result.message ?? '',
-                        isError: true, bottomPadding: 70);
-                  }
-                  // final qbService =
-                  //     Provider.of<QuickBloxService>(context, listen: false);
-                  // qbService.openKaleyraChat(kaleyraUserId,
-                  //     widget.kaleyraUserId.toString(), kaleyraAccessToken);
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => RaiseATicket(
+                        name: widget.name,
+                        email: widget.email,
+                      ),
+                    ),
+                  );
                 },
                 child: Image.asset(
-                  'assets/images/Group 4891.png',
+                  'assets/images/noun-tickets-1089959.png',
                   height: 2.5.h,
                   width: 2.5.h,
                   color: gBlackColor,
                 ),
               ),
+        SizedBox(
+          width: 2.w,
+        )
+        // widget.chat
+        //     ? const SizedBox()
+        //     : GestureDetector(
+        //         onTap: () async {
+        //           final kaleyraUserId = _pref.getString("kaleyraUserId");
+        //           final res = await getKaleyraAccessToken(kaleyraUserId!);
+        //
+        //           if (res.runtimeType != ErrorModel) {
+        //             final accessToken =
+        //                 _pref.getString(GwcApi.kaleyraAccessToken);
+        //
+        //             // chat
+        //             openKaleyraChat(kaleyraUserId,
+        //                 widget.kaleyraUserId.toString(), accessToken!);
+        //           } else {
+        //             final result = res as ErrorModel;
+        //             print("get Access Token error: ${result.message}");
+        //             GwcApi().showSnackBar(context, result.message ?? '',
+        //                 isError: true, bottomPadding: 70);
+        //           }
+        //           // final qbService =
+        //           //     Provider.of<QuickBloxService>(context, listen: false);
+        //           // qbService.openKaleyraChat(kaleyraUserId,
+        //           //     widget.kaleyraUserId.toString(), kaleyraAccessToken);
+        //         },
+        //         child: Image.asset(
+        //           'assets/images/Group 4891.png',
+        //           height: 2.5.h,
+        //           width: 2.5.h,
+        //           color: gBlackColor,
+        //         ),
+        //       ),
       ],
     );
   }

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../controller/meal_active_list_controller.dart';
+import '../../../utils/constants.dart';
 import '../../../widgets/common_screen_widgets.dart';
 import '../../../widgets/widgets.dart';
 import '../../common_ui/call_chat_icons.dart';
@@ -43,10 +44,10 @@ class _TransitionListState extends State<TransitionList> {
               var data = snapshot.data;
               return Column(
                 children: [
-                  Container(
-                    height: 1,
-                    color: Colors.grey.withOpacity(0.3),
-                  ),
+                  // Container(
+                  //   height: 1,
+                  //   color: Colors.grey.withOpacity(0.3),
+                  // ),
                   SizedBox(height: 2.h),
                   ListView.builder(
                     scrollDirection: Axis.vertical,
@@ -83,33 +84,53 @@ class _TransitionListState extends State<TransitionList> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         TransitionDetailsScreen(
-                                      userName: data[index]
-                                              .userDetails
-                                              .patient
-                                              .user
-                                              .name ??
-                                          "",
-                                      age:
+                                          userName:
+                                          data[index].userDetails.patient.user.name ??
+                                              "",
+                                          age:
                                           "${data[index].userDetails.patient.user.age ?? ""} ${data[index].userDetails.patient.user.gender ?? ""}",
-                                      appointmentDetails:
+                                          appointmentDetails:
                                           "${data[index].userDetails.appointmentDate ?? ""} / ${data[index].userDetails.appointmentTime ?? ""}",
-                                      status: buildStatusText(
-                                          data[index].userDetails.status),
-                                      transitionCurrentDay: data[index]
-                                          .userDetails
-                                          .patient
-                                          .user
-                                          .userProgram
-                                          .tpCurrentDay,
-                                      finalDiagnosis:
+                                          status: buildStatusText(
+                                              data[index].userDetails.status),
+                                          startDate:
+                                          data[index].userProgramStartDate ?? "",
+                                          presentDay: data[index].userPresentDay ?? '',
+                                          finalDiagnosis:
                                           data[index].userFinalDiagnosis ?? '',
-                                      preparatoryCurrentDay: data[index]
+                                          preparatoryCurrentDay: data[index]
                                               .userDetails
                                               .patient
                                               .user
                                               .userProgram
                                               .ppCurrentDay ??
-                                          "",
+                                              "",
+                                          transitionCurrentDay: data[index]
+                                              .userDetails
+                                              .patient
+                                              .user
+                                              .userProgram
+                                              .tpCurrentDay,
+                                          transitionDays: data[index]
+                                              .userDetails
+                                              .patient
+                                              .user
+                                              .userProgram
+                                              .transDays ??
+                                              "",
+                                          prepDays: data[index]
+                                              .userDetails
+                                              .patient
+                                              .user
+                                              .userProgram
+                                              .prepDays ??
+                                              "",
+                                          isPrepCompleted: data[index]
+                                              .userDetails
+                                              .patient
+                                              .user
+                                              .userProgram
+                                              .isPrepCompleted,
                                     ),
                                   ),
                                 );
@@ -142,7 +163,11 @@ class _TransitionListState extends State<TransitionList> {
                                           Navigator.of(context).push(
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  const ShowProfile(),
+                                                   ShowProfile(userId: data[index]
+                                                       .userDetails
+                                                       .patient
+                                                       .user
+                                                       .id),
                                             ),
                                           );
                                         },
@@ -195,6 +220,68 @@ class _TransitionListState extends State<TransitionList> {
                                                 ),
                                               ],
                                             ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  "Start Date : ",
+                                                  style: AllListText().otherText(),
+                                                ),
+                                                Text(
+                                                  data[index]
+                                                      .userProgramStartDate
+                                                      .toString(),
+                                                  style:
+                                                  AllListText().subHeadingText(),
+                                                ),
+                                              ],
+                                            ),
+                                            // SizedBox(height: 0.5.h),
+                                            // Row(
+                                            //   children: [
+                                            //     Text(
+                                            //       "Present Day : ",
+                                            //       style: TextStyle(
+                                            //           fontFamily: "GothamBook",
+                                            //           color: gBlackColor,
+                                            //           fontSize: 8.sp),
+                                            //     ),
+                                            //     Text(
+                                            //       data[index]
+                                            //           .userPresentDay
+                                            //           .toString(),
+                                            //       style: TextStyle(
+                                            //           fontFamily: "GothamMedium",
+                                            //           color: gPrimaryColor,
+                                            //           fontSize: 8.sp),
+                                            //     ),
+                                            //   ],
+                                            // ),
+
+                                            // Row(
+                                            //   children: [
+                                            //     Text(
+                                            //       "Final Diagnosis : ",
+                                            //       style: AllListText().otherText(),
+                                            //     ),
+                                            //     Expanded(
+                                            //       child: Text(
+                                            //         data[index]
+                                            //             .userFinalDiagnosis
+                                            //             .toString(),
+                                            //         maxLines: 1,
+                                            //         overflow: TextOverflow.ellipsis,
+                                            //         style: AllListText()
+                                            //             .subHeadingText(),
+                                            //       ),
+                                            //     ),
+                                            //   ],
+                                            // ),
+                                            buildPreparatoryStatus(data[index]
+                                                .userDetails
+                                                .patient
+                                                .user
+                                                .userProgram
+                                                .isPrepCompleted),
                                           ],
                                         ),
                                       ),
@@ -290,6 +377,19 @@ class _TransitionListState extends State<TransitionList> {
             );
           }),
     );
+  }
+
+  buildPreparatoryStatus(String isPrepCompleted) {
+    return (isPrepCompleted == "1") && (isPrepCompleted != "null")
+        ? Text(
+      "Preparatory Plan Completed by user",
+      style: TextStyle(
+          height: 1.3,
+          fontFamily: fontMedium,
+          color: gSecondaryColor,
+          fontSize: fontSize08),
+    )
+        : const SizedBox();
   }
 
   saveUserId(String patientId, String teamPatientId, String userId) async {

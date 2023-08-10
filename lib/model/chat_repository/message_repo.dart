@@ -1,4 +1,4 @@
-import '../../controller/api_service.dart';
+import '../../service/api_service.dart';
 
 class MessageRepository {
   ApiClient apiClient;

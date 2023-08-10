@@ -1,55 +1,61 @@
-import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
 import '../../model/customer_profile_model.dart';
+import '../../model/error_model.dart';
+import '../../repository/customer_details_repo/customer_profile_repo.dart';
+import '../../service/api_service.dart';
+import '../../service/customer_details_service/customer_profile_service.dart';
 import '../../utils/constants.dart';
-import '../../utils/gwc_api.dart';
 import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
-import '../customer_details_screens/active_details_screens/meal_plan_details.dart';
-import 'case_sheet.dart';
-import 'mr_screen.dart';
+import '../calendar_screen/calendar_customer_details.dart';
+import '../nutri_delight_screens/nutri_delight_screen.dart';
 
 class ShowProfile extends StatefulWidget {
-  const ShowProfile({Key? key}) : super(key: key);
+  final int userId;
+  const ShowProfile({Key? key, required this.userId}) : super(key: key);
 
   @override
   State<ShowProfile> createState() => _ShowProfileState();
 }
 
 class _ShowProfileState extends State<ShowProfile> {
-  bool circular = true;
   GetCustomerModel? getCustomerModel;
+
+  bool showProgress = false;
+
+  late final CustomerProfileService customerProfileService =
+  CustomerProfileService(customerProfileRepo: repository);
 
   @override
   void initState() {
     super.initState();
-    getProfileData();
+    getCustomerDetails();
   }
 
-  void getProfileData() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    var token = preferences.getString("token")!;
-    var userId = preferences.getString("user_id");
-
-    var response = await http
-        .get(Uri.parse("${GwcApi.getCustomerProfileApiUrl}/$userId"), headers: {
-      'Authorization': 'Bearer $token',
-    });
-    print("showUserProfileUrl : ${GwcApi.getCustomerProfileApiUrl}/$userId");
-    print("showUserProfileResponse : ${response.body}");
-
-    var data = jsonDecode(response.body);
-
+  getCustomerDetails() async {
     setState(() {
-      getCustomerModel = GetCustomerModel.fromJson(data);
+      showProgress = true;
     });
-    circular = false;
+    final result = await customerProfileService.getCustomerProfileService("${widget.userId}");
+    print("result: $result");
+
+    if (result.runtimeType == GetCustomerModel) {
+      print("Customer Profile");
+      GetCustomerModel model = result as GetCustomerModel;
+
+      getCustomerModel = model;
+    } else {
+      ErrorModel model = result as ErrorModel;
+      print("error: ${model.message}");
+    }
+    setState(() {
+      showProgress = false;
+    });
+    print(result);
   }
 
   @override
@@ -74,7 +80,7 @@ class _ShowProfileState extends State<ShowProfile> {
   }
 
   buildUserDetails() {
-    return circular
+    return showProgress
         ? buildCircularIndicator()
         : LayoutBuilder(builder: (context, constraints) {
             return Stack(
@@ -142,54 +148,120 @@ class _ShowProfileState extends State<ShowProfile> {
                                 getCustomerModel?.programName?.name ?? ""),
                         getCustomerModel?.mealAndYogaPlan == null
                             ? const SizedBox()
-                            : profileTile("Meal & Yoga Plan : ",
+                            : profileTile(
+                                "Meal & Yoga Plan : ",
                                 getCustomerModel?.mealAndYogaPlan?.name ?? "",
-                                showViewText:
-                                    getCustomerModel?.mealAndYogaPlan == null
-                                        ? false
-                                        : true,
-                                viewText: 'view', func: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => const MealPlanDetails(
-                                      isFromProfile: true,
-                                    ),
-                                  ),
-                                );
-                              }),
+                                //   showViewText:
+                                //       getCustomerModel?.mealAndYogaPlan == null
+                                //           ? false
+                                //           : true,
+                                //   viewText: 'view', func: () {
+                                //   Navigator.of(context).push(
+                                //     MaterialPageRoute(
+                                //       builder: (context) => NutriDelightScreen(
+                                //         isDetox: false,
+                                //         userName: getCustomerModel?.username ?? "",
+                                //         age: getCustomerModel?.age ?? "",
+                                //         appointmentDetails: buildTimeDate(
+                                //             getCustomerModel
+                                //                 ?.consultationDateAndTime?.date ??
+                                //                 "",
+                                //             getCustomerModel?.consultationDateAndTime
+                                //                 ?.slotStartTime ??
+                                //                 ""),
+                                //         status: getCustomerModel?.mealAndYogaPlan?.name ?? '',
+                                //         finalDiagnosis: '',
+                                //         preparatoryCurrentDay: '',
+                                //         transitionCurrentDay: '',
+                                //         isPrepCompleted: '', isProgramStatus: '', programDayStatus: '',
+                                //       ),
+                                //     ),
+                                //   );
+                                // }
+                              ),
                         getCustomerModel?.mrReport == null
                             ? const SizedBox()
-                            : profileTile("MR Report : ", "Uploaded",
-                                showViewText: getCustomerModel?.mrReport == null
-                                    ? false
-                                    : true,
-                                viewText: 'view', func: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => MRScreen(
-                                      report:
-                                          "${getCustomerModel?.mrReport?.report}",
-                                    ),
-                                  ),
-                                );
-                              }),
+                            : profileTile(
+                                "MR Report : ", "Uploaded",
+                                //   showViewText: getCustomerModel?.mrReport == null
+                                //       ? false
+                                //       : true,
+                                //   viewText: 'view', func: () {
+                                //   Navigator.of(context).push(
+                                //     MaterialPageRoute(
+                                //       builder: (context) => MRScreen(
+                                //         report:
+                                //             "${getCustomerModel?.mrReport?.report}",
+                                //       ),
+                                //     ),
+                                //   );
+                                // }
+                              ),
                         getCustomerModel?.caseSheet == null
                             ? const SizedBox()
-                            : profileTile("Case Sheet : ", "Uploaded",
-                                showViewText:
-                                    getCustomerModel?.caseSheet == null
-                                        ? false
-                                        : true,
-                                viewText: 'view', func: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => CaseSheetDetails(
-                                      report:
-                                          "${getCustomerModel?.caseSheet?.report}",
+                            : profileTile(
+                                "Case Sheet : ", "Uploaded",
+                                //   showViewText:
+                                //       getCustomerModel?.caseSheet == null
+                                //           ? false
+                                //           : true,
+                                //   viewText: 'view', func: () {
+                                //   Navigator.of(context).push(
+                                //     MaterialPageRoute(
+                                //       builder: (context) => CaseSheetDetails(
+                                //         report:
+                                //             "${getCustomerModel?.caseSheet?.report}",
+                                //       ),
+                                //     ),
+                                //   );
+                                // }
+                              ),
+                        SizedBox(height: 2.h),
+                        GestureDetector(
+                          onTap: () {
+                            // saveUserId("", "", appointmentDetails.userId);
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NutriDelightScreen(
+                                      userId: widget.userId,
+                                      tabIndex: 1,
+                                      userName: getCustomerModel?.username ?? "",
+                                      age:getCustomerModel?.age ?? "",
+                                      appointmentDetails: buildTimeDate(
+                                    getCustomerModel
+                                        ?.consultationDateAndTime?.date ??
+                                    "",
+                                    getCustomerModel?.consultationDateAndTime
+                                        ?.slotStartTime ??
+                                        ""),
+                                      status: "",
+                                      finalDiagnosis: '',
+                                      preparatoryCurrentDay: '',
+                                      transitionCurrentDay: '',
+                                      isPrepCompleted: '',
+                                      isProgramStatus: '',programDayStatus: '', updateTime: '', updateDate: '',
                                     ),
-                                  ),
-                                );
-                              }),
+                                //     CalendarCustomerScreen(
+                                //   userId: widget.userId,
+                                //   tabIndex: 0,
+                                // ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 1.h, horizontal: 3.w),
+                            decoration: BoxDecoration(
+                              color: gSecondaryColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              'View',
+                              style: LoginScreen().buttonText(whiteTextColor),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -248,4 +320,10 @@ class _ShowProfileState extends State<ShowProfile> {
     }
     return "${DateFormat('dd MMMM yyyy').format(DateTime.parse("$date $time"))} / $hour : $minute $amPm";
   }
+
+  final CustomerProfileRepo repository = CustomerProfileRepo(
+    apiClient: ApiClient(
+      httpClient: http.Client(),
+    ),
+  );
 }

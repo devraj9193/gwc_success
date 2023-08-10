@@ -8,6 +8,8 @@ import '../../../widgets/common_screen_widgets.dart';
 import '../../../widgets/widgets.dart';
 import 'package:get/get.dart';
 
+import '../transition_details_screen/transition_answer_screen.dart';
+
 class MealPlanDetails extends StatefulWidget {
   final bool isFromProfile;
   const MealPlanDetails({Key? key, this.isFromProfile = false})
@@ -168,6 +170,55 @@ class _MealPlanDetailsState extends State<MealPlanDetails> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         ...groupList(),
+                             GestureDetector(
+                          onTap: () {
+                            // buildPreparatory(
+                            //     transitionMealPlanModel?.days ?? "",
+                            //     widget.transitionCurrentDay,
+                            //     context);
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(
+                                horizontal: 20.w, vertical: 5.h),
+                            padding:
+                            EdgeInsets.symmetric(vertical: 1.2.h),
+                            decoration: BoxDecoration(
+                              color: gSecondaryColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text('Transition Tracker',
+                                  style: LoginScreen()
+                                      .buttonText(whiteTextColor)),
+                            ),
+                          ),
+                        ),
+                        // (widget.isTransition) &&
+                        //     widget.transitionCurrentDay.isNotEmpty
+                        //     ? GestureDetector(
+                        //   onTap: () {
+                        //     buildPreparatory(
+                        //         transitionMealPlanModel?.days ?? "",
+                        //         widget.transitionCurrentDay,
+                        //         context);
+                        //   },
+                        //   child: Container(
+                        //     margin: EdgeInsets.symmetric(
+                        //         horizontal: 20.w, vertical: 5.h),
+                        //     padding:
+                        //     EdgeInsets.symmetric(vertical: 1.2.h),
+                        //     decoration: BoxDecoration(
+                        //       color: gSecondaryColor,
+                        //       borderRadius: BorderRadius.circular(10),
+                        //     ),
+                        //     child: Center(
+                        //       child: Text('Transition Tracker',
+                        //           style: LoginScreen()
+                        //               .buttonText(whiteTextColor)),
+                        //     ),
+                        //   ),
+                        // )
+                        //     : const SizedBox(),
                       ],
                     ),
                   );
@@ -350,6 +401,17 @@ class _MealPlanDetailsState extends State<MealPlanDetails> {
         ),
       ),
     ]);
+  }
+
+  void buildPreparatory(String days, String currentDay, BuildContext context) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => TransitionAnswerScreen(
+        days: days,
+        currentDay: currentDay,
+      ),
+    );
   }
 
   void changedIndex(String index) {

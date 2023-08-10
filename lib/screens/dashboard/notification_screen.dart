@@ -228,7 +228,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       return Container(
         height: 4.5.h,
         width: 10.w,
-        color: gSecondaryColor,
+         color: gWhiteColor,
       );
     }
   }

@@ -1,4 +1,4 @@
-import '../../controller/api_service.dart';
+import '../../service/api_service.dart';
 import 'chat_support_repo.dart';
 import 'chat_support_service.dart';
 import 'package:http/http.dart' as http;

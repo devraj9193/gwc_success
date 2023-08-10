@@ -25,7 +25,7 @@ class DoctorsList {
   factory DoctorsList.fromJson(Map<String, dynamic> json) => DoctorsList(
         status: json["status"],
         errorCode: json["errorCode"],
-        key: json["key"],
+        key: json["key"].toString(),
         data: List<DoctorsTeam>.from(
             json["data"].map((x) => DoctorsTeam.fromJson(x))),
       );
@@ -54,6 +54,7 @@ class DoctorsTeam {
     this.address,
     this.otp,
     this.deviceToken,
+    this.uvUserId,
     this.deviceType,
     this.deviceId,
     this.age,
@@ -81,6 +82,7 @@ class DoctorsTeam {
   String? otp;
   String? deviceToken;
   String? deviceType;
+  String? uvUserId;
   String? deviceId;
   String? age;
   String? kaleyraUserId;
@@ -93,29 +95,30 @@ class DoctorsTeam {
 
   factory DoctorsTeam.fromJson(Map<String, dynamic> json) => DoctorsTeam(
         id: json["id"],
-        roleId: json["role_id"],
-        name: json["name"],
-        fname: json["fname"],
-        lname: json["lname"],
-        email: json["email"],
-        emailVerifiedAt: json["email_verified_at"],
-        countryCode: json["country_code"],
-        phone: json["phone"],
-        gender: json["gender"],
-        profile: json["profile"],
-        address: json["address"],
-        otp: json["otp"],
-        deviceToken: json["device_token"],
-        deviceType: json["device_type"],
-        deviceId: json["device_id"],
+        roleId: json["role_id"].toString(),
+        name: json["name"].toString(),
+        fname: json["fname"].toString(),
+        lname: json["lname"].toString(),
+        email: json["email"].toString(),
+        emailVerifiedAt: json["email_verified_at"].toString(),
+        countryCode: json["country_code"].toString(),
+        phone: json["phone"].toString(),
+        gender: json["gender"].toString(),
+        profile: json["profile"].toString(),
+        address: json["address"].toString(),
+        otp: json["otp"].toString(),
+        deviceToken: json["device_token"].toString(),
+        deviceType: json["device_type"].toString(),
+        deviceId: json["device_id"].toString(),
+        uvUserId: json['uv_user_id'].toString(),
         age: json["age"],
-        kaleyraUserId: json["kaleyra_user_id"],
-        pincode: json["pincode"],
-        isActive: json["is_active"],
-        addedBy: json["added_by"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
-        signupDate: json["signup_date"],
+        kaleyraUserId: json["kaleyra_user_id"].toString(),
+        pincode: json["pincode"].toString(),
+        isActive: json["is_active"].toString(),
+        addedBy: json["added_by"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
+        signupDate: json["signup_date"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -135,6 +138,7 @@ class DoctorsTeam {
         "device_token": deviceToken,
         "device_type": deviceType,
         "device_id": deviceId,
+        'uv_user_id': uvUserId,
         "age": age,
         "kaleyra_user_id": kaleyraUserId,
         "pincode": pincode,

@@ -1,21 +1,22 @@
-import 'dart:convert';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:gwc_success_team/screens/bottom_bar/dashboard_screen.dart';
 import 'package:gwc_success_team/widgets/unfocus_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:http/http.dart' as http;
-import '../../controller/api_service.dart';
+import '../../model/error_model.dart';
+import '../../model/login_model/login_model.dart';
+import '../../repository/login_repo/login_otp_repository.dart';
+import '../../service/api_service.dart';
 import '../../model/success_user_model/success_member_profile_repository.dart';
 import '../../model/success_user_model/success_member_service.dart';
 import '../../model/user_profile_model.dart';
+import '../../service/login_service/login_otp_service.dart';
 import '../../utils/constants.dart';
 import '../../utils/gwc_api.dart';
+import '../../utils/success_member_storage.dart';
 import '../../widgets/common_screen_widgets.dart';
 import '../../widgets/widgets.dart';
-import '../../widgets/will_pop_widget.dart';
 
 class SuccessLogin extends StatefulWidget {
   const SuccessLogin({Key? key}) : super(key: key);
@@ -27,6 +28,7 @@ class SuccessLogin extends StatefulWidget {
 class _SuccessLoginState extends State<SuccessLogin> {
   final formKey = GlobalKey<FormState>();
   final SharedPreferences _pref = GwcApi.preferences!;
+  late LoginWithOtpService _loginWithOtpService;
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -38,6 +40,7 @@ class _SuccessLoginState extends State<SuccessLogin> {
   void initState() {
     super.initState();
     doctorDeviceToken();
+    _loginWithOtpService = LoginWithOtpService(repository: repository);
     passwordVisibility = false;
     emailController.addListener(() {
       setState(() {});
@@ -63,85 +66,83 @@ class _SuccessLoginState extends State<SuccessLogin> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopWidget(
-      child: UnfocusWidget(
-        child: Scaffold(
-          body: LayoutBuilder(builder: (context, constraints) {
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                const Image(
-                  image: AssetImage(
-                    "assets/images/environment-green-watercolor-background-with-leaf-border-illustration (1).png",
+    return UnfocusWidget(
+      child: Scaffold(
+        body: LayoutBuilder(builder: (context, constraints) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              const Image(
+                image: AssetImage(
+                  "assets/images/environment-green-watercolor-background-with-leaf-border-illustration (1).png",
+                ),
+                fit: BoxFit.fill,
+              ),
+              Column(
+                children: [
+                  SizedBox(height: 12.h),
+                  Center(
+                    child: Image(
+                      image: const AssetImage(
+                          "assets/images/Gut wellness logo.png"),
+                      height: 12.h,
+                    ),
                   ),
-                  fit: BoxFit.fill,
-                ),
-                Column(
-                  children: [
-                    SizedBox(height: 12.h),
-                    Center(
-                      child: Image(
-                        image: const AssetImage(
-                            "assets/images/Gut wellness logo.png"),
-                        height: 12.h,
+                  SizedBox(height: 6.h),
+                  Padding(
+                    padding: EdgeInsets.only(left: 5.w),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "WELCOME TO",
+                        style: LoginScreen().welcomeText(),
                       ),
                     ),
-                    SizedBox(height: 6.h),
-                    Padding(
-                      padding: EdgeInsets.only(left: 5.w),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "WELCOME TO",
-                          style: LoginScreen().welcomeText(),
-                        ),
+                  ),
+                  SizedBox(height: 1.h),
+                  Padding(
+                    padding: EdgeInsets.only(left: 5.w),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        "Success Team",
+                        style: LoginScreen().doctorAppText(),
                       ),
                     ),
-                    SizedBox(height: 1.h),
-                    Padding(
-                      padding: EdgeInsets.only(left: 5.w),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Success Team",
-                          style: LoginScreen().doctorAppText(),
-                        ),
-                      ),
-                    ),
-                    buildForm(),
-                    // Padding(
-                    //   padding: const EdgeInsets.all(8.0),
-                    //   child: RichText(
-                    //     text: TextSpan(
-                    //         text: 'By signing up, you are agree with our',
-                    //         style: TextStyle(
-                    //             fontFamily: "GothamBold",
-                    //             color: gMainColor,
-                    //             fontSize: 8.sp),
-                    //         children: [
-                    //           TextSpan(
-                    //             text: 'Terms & Conditions',
-                    //             style: TextStyle(
-                    //               fontFamily: "GothamBold",
-                    //               color: gMainColor,
-                    //               fontSize: 8.sp,
-                    //               decoration: TextDecoration.underline,
-                    //             ),
-                    //             recognizer: TapGestureRecognizer()
-                    //               ..onTap = () {
-                    //                 // print('Tap Here onTap');
-                    //               },
-                    //           )
-                    //         ]),
-                    //   ),
-                    // ),
-                    // SizedBox(height: 3.h),
-                  ],
-                ),
-              ],
-            );
-          }),
-        ),
+                  ),
+                  buildForm(),
+                  // Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: RichText(
+                  //     text: TextSpan(
+                  //         text: 'By signing up, you are agree with our',
+                  //         style: TextStyle(
+                  //             fontFamily: "GothamBold",
+                  //             color: gMainColor,
+                  //             fontSize: 8.sp),
+                  //         children: [
+                  //           TextSpan(
+                  //             text: 'Terms & Conditions',
+                  //             style: TextStyle(
+                  //               fontFamily: "GothamBold",
+                  //               color: gMainColor,
+                  //               fontSize: 8.sp,
+                  //               decoration: TextDecoration.underline,
+                  //             ),
+                  //             recognizer: TapGestureRecognizer()
+                  //               ..onTap = () {
+                  //                 // print('Tap Here onTap');
+                  //               },
+                  //           )
+                  //         ]),
+                  //   ),
+                  // ),
+                  // SizedBox(height: 3.h),
+                ],
+              ),
+            ],
+          );
+        }),
       ),
     );
   }
@@ -303,7 +304,14 @@ class _SuccessLoginState extends State<SuccessLogin> {
                   onTap: (isLoading)
                       ? null
                       : () {
-                          buildLogin();
+                          if (formKey.currentState!.validate() &&
+                              emailController.text.isNotEmpty &&
+                              passwordController.text.isNotEmpty) {
+                            buildLogin(
+                              emailController.text.toString(),
+                              passwordController.text.toString(),
+                            );
+                          }
                         },
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 10.w),
@@ -351,77 +359,61 @@ class _SuccessLoginState extends State<SuccessLogin> {
     );
   }
 
-  void buildLogin() async {
-    if (formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-      await FirebaseMessaging.instance.getToken().then((value) {
-        setState(() {
-          deviceToken = value!;
-          print("Device Token is Login: $deviceToken");
-        });
-      });
-      try {
-        Map<String, dynamic> dataBody = {
-          "email": emailController.text.toString(),
-          "password": passwordController.text.toString(),
-          "device_token": deviceToken,
-        };
-        print("dataBody : $dataBody");
-        var response =
-            await http.post(Uri.parse(GwcApi.loginApiUrl), body: dataBody);
-        print("login: ${response.body}");
-        if (response.statusCode == 200) {
-          setState(() {
-            isLoading = true;
-          });
-          Map<String, dynamic> responseData = jsonDecode(response.body);
-          saveData(
-            responseData["access_token"],
-            responseData["user"]["login_username"].toString(),
-            responseData["user"]["chat_id"].toString(),
-            responseData["user"]["kaleyra_user_id"].toString(),
-          );
-          print("Token : ${responseData["access_token"]}");
-          if (responseData['status'] == 200) {
-            setState(() {
-              isLoading = true;
-            });
-            // final qbService =
-            //     Provider.of<QuickBloxService>(context, listen: false);
-            // qbService.login(responseData["user"]["login_username"].toString());
+  final LoginOtpRepository repository = LoginOtpRepository(
+    apiClient: ApiClient(
+      httpClient: http.Client(),
+    ),
+  );
 
-            buildSnackBar("Login", "Successful");
-            // qbService.kaleyraLogin(
-            //     responseData["user"]["kaleyra_user_id"].toString());
-            storeUserProfile(responseData["access_token"]);
-            Get.to(() => const DashboardScreen());
-          } else if (responseData['status'] == 401) {
-            setState(() {
-              isLoading = false;
-            });
-            buildSnackBar("Login Failed", responseData['message']);
-          }
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-          buildSnackBar("Login Failed", "API Problem");
-        }
-      } catch (e) {
-        setState(() {
-          isLoading = false;
-        });
-        print(e);
-        buildSnackBar("Login Failed", "$e");
-        throw Exception(e);
-      }
+  buildLogin(String phone, String pwd) async {
+    setState(() {
+      isLoading = true;
+    });
+    print("---------Login---------");
+
+    final result = await _loginWithOtpService.loginWithOtpService(
+        phone, pwd, "$deviceToken");
+
+    if (result.runtimeType == LoginModel) {
+      LoginModel model = result as LoginModel;
+      setState(() {
+        isLoading = false;
+      });
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const DashboardScreen(),
+        ),
+      );
+      _pref.setString(SuccessMemberStorage.successMemberName, model.user?.name ?? "");
+      _pref.setString(SuccessMemberStorage.successMemberEmail, model.user?.email ?? "");
+      _pref.setString(SuccessMemberStorage.successMemberUvId, model.user?.uvUserId ?? "");
+      _pref.setString(SuccessMemberStorage.successMemberUvToken, model.uvToken ?? "");
+
+      print("Success Member UvId : ${_pref.getString(SuccessMemberStorage.successMemberUvId)}");
+      saveData(
+        model.accessToken ?? '',
+        model.user?.loginUsername ?? "",
+        model.user?.chatId ?? "",
+        model.user?.kaleyraUserId ?? "",
+      );
+
+      print("Login_Username : ${model.user?.loginUsername}");
+      print("chat_id : ${model.user?.chatId}");
+      storeUserProfile("${model.accessToken}");
     } else {
       setState(() {
         isLoading = false;
       });
-      buildSnackBar("Invalid Form", "Please complete the form Properly");
+      _pref.setBool(GwcApi.isLogin, false);
+
+      ErrorModel response = result as ErrorModel;
+      GwcApi().showSnackBar(context, response.message!, isError: true);
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(
+      //     builder: (context) => const DashboardScreen(),
+      //   ),
+      // );
     }
   }
 
@@ -456,14 +448,14 @@ class _SuccessLoginState extends State<SuccessLogin> {
 
   saveData(String token, String chatUserName, String chatUserId,
       String kaleyraUserId) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setString("token", token);
-    preferences.setString("chatUserName", chatUserName);
-    preferences.setString("chatUserId", chatUserId);
-    preferences.setString("kaleyraUserId", kaleyraUserId);
+    _pref.setBool(GwcApi.isLogin, true);
+    _pref.setString("token", token);
+    _pref.setString("chatUserName", chatUserName);
+    _pref.setString("chatUserId", chatUserId);
+    _pref.setString("kaleyraUserId", kaleyraUserId);
 
-    print("QB User Name : ${preferences.getString("chatUserName")}");
-    print("QB Chat Id : ${preferences.getString("chatUserId")}");
-    print("Kaleyra Chat Id : ${preferences.getString("kaleyraUserId")}");
+    print("QB User Name : ${_pref.getString("chatUserName")}");
+    print("QB Chat Id : ${_pref.getString("chatUserId")}");
+    print("Kaleyra Chat Id : ${_pref.getString("kaleyraUserId")}");
   }
 }

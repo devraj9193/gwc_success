@@ -41,10 +41,10 @@ class GetCustomerModel {
       GetCustomerModel(
         status: json["status"],
         errorCode: json["errorCode"],
-        key: json["key"],
-        username: json["username"],
-        age: json["age"],
-        profile: json["profile"],
+        key: json["key"].toString(),
+        username: json["username"].toString(),
+        age: json["age"].toString(),
+        profile: json["profile"].toString(),
         consultationDateAndTime: json["consultation_date_and_time"] != null
             ? ConsultationDateAndTime.fromJson(json["consultation_date_and_time"])
             : null,
@@ -102,14 +102,14 @@ class CaseSheet {
 
   factory CaseSheet.fromJson(Map<String, dynamic> json) => CaseSheet(
         id: json["id"],
-        doctorId: json["doctor_id"],
-        patientId: json["patient_id"],
-        appointmentId: json["appointment_id"],
-        report: json["report"],
-        reportType: json["report_type"],
-        isArchieved: json["is_archieved"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
+        doctorId: json["doctor_id"].toString(),
+        patientId: json["patient_id"].toString(),
+        appointmentId: json["appointment_id"].toString(),
+        report: json["report"].toString(),
+        reportType: json["report_type"].toString(),
+        isArchieved: json["is_archieved"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -159,18 +159,18 @@ class ConsultationDateAndTime {
   factory ConsultationDateAndTime.fromJson(Map<String, dynamic> json) =>
       ConsultationDateAndTime(
         id: json["id"],
-        teamPatientId: json["team_patient_id"],
-        date: json["date"],
-        slotStartTime: json["slot_start_time"],
-        slotEndTime: json["slot_end_time"],
-        type: json["type"],
-        status: json["status"],
-        kaleyraUserUrl: json["kaleyra_user_url"],
-        userSuccessChatRoom: json["user_success_chat_room"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
-        appointmentDate: json["appointment_date"],
-        appointmentStartTime: json["appointment_start_time"],
+        teamPatientId: json["team_patient_id"].toString(),
+        date: json["date"].toString(),
+        slotStartTime: json["slot_start_time"].toString(),
+        slotEndTime: json["slot_end_time"].toString(),
+        type: json["type"].toString(),
+        status: json["status"].toString(),
+        kaleyraUserUrl: json["kaleyra_user_url"].toString(),
+        userSuccessChatRoom: json["user_success_chat_room"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
+        appointmentDate: json["appointment_date"].toString(),
+        appointmentStartTime: json["appointment_start_time"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -216,14 +216,14 @@ class MealAndYogaPlan {
   factory MealAndYogaPlan.fromJson(Map<String, dynamic> json) =>
       MealAndYogaPlan(
         id: json["id"],
-        issueId: json["issue_id"],
-        name: json["name"],
-        noOfDays: json["no_of_days"],
-        desc: json["desc"],
-        price: json["price"],
-        profile: json["profile"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
+        issueId: json["issue_id"].toString(),
+        name: json["name"].toString(),
+        noOfDays: json["no_of_days"].toString(),
+        desc: json["desc"].toString(),
+        price: json["price"].toString(),
+        profile: json["profile"].toString(),
+        createdAt: json["created_at"].toString(),
+        updatedAt: json["updated_at"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
